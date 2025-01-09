@@ -44,7 +44,7 @@ grouped_data = data.groupby(['gang', 'Victim Country']).size().unstack(fill_valu
 total_occurrences = grouped_data.sum(axis=1)
 percentage_data = grouped_data.div(total_occurrences, axis=0) * 100
 
-over_100_gangs = total_occurrences[total_occurrences >= 100].index
+over_100_gangs = total_occurrences[total_occurrences >= 50].index
 gangs_filtered = percentage_data.loc[over_100_gangs]
 
 # Filtrare le gang con percentuale > 65% su Victim Country: USA e > 25% su un'altra singola Victim Country
@@ -100,7 +100,7 @@ plt.xlabel('Ransomware Gang', fontsize=14)
 plt.ylabel('Percentuale di attacchi', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
 plt.legend(title='Nazione', bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.text(x=7.7,y=0,s='Nazioni considerate se:\nUSA > 65%\nOthers > 25%', bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
+plt.text(x=15,y=0,s='Nazioni considerate se:\nUSA > 65%\nOthers > 25%', bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
 plt.tight_layout()
 
 # Salvataggio del grafico
