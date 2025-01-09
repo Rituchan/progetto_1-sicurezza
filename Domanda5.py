@@ -156,7 +156,7 @@ fig, axes = plt.subplots(2, 1, figsize=(12, 12))
 top_victims.plot(kind='bar', color='orange', edgecolor='black', ax=axes[0])
 axes[0].set_title('Vittime colpite più di 2 volte', fontsize=16)
 axes[0].set_xlabel('Vittime', fontsize=14)
-axes[0].set_ylabel('Attacchi', fontsize=14)
+axes[0].set_ylabel('Numero di attacchi', fontsize=14)
 axes[0].tick_params(axis='x', rotation=45)
 
 # Secondo istogramma: Distribuzione delle percentuali

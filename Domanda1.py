@@ -28,12 +28,11 @@ plt.figure(figsize=(10, 8))
 pie_data.plot(kind='pie', autopct='%1.1f%%', startangle=90, colormap='tab20')
 
 # Personalizzazione del grafico
-plt.title('Distribuzione Percentuale Victim Country', fontsize=16)
+plt.title('Distribuzione attacchi in base alla nazione colpita', fontsize=16)
 plt.ylabel('')  # Rimuovere etichetta dell'asse Y
 plt.tight_layout()
 
 # Salvataggio del grafico
-#plt.savefig('victim_country_piechart_with_other.png')
 plt.show()
 
 #######################################################################
@@ -65,7 +64,7 @@ def process_gang(row):
             'USA': usa_percentage,
             'other': other_percentage
         })
-    else :
+    else:
         top_country = other_countries.idxmax()
         other_percentage = 100 - (usa_percentage + top_percentage)
         return pd.Series({
@@ -80,21 +79,29 @@ processed_data = filtered_gangs.apply(process_gang, axis=1)
 # Ordinare i dati filtrati per la percentuale massima
 processed_data = processed_data.loc[processed_data.max(axis=1).sort_values(ascending=False).index]
 
-
-
-plt.figure(figsize=(14, 10))
-processed_data.plot(
-    kind='bar', stacked=True, colormap='Set3',  figsize=(14, 8)
+# Creazione del grafico a barre con annotazioni
+fig, ax = plt.subplots(figsize=(14, 8))
+bars = processed_data.plot(
+    kind='bar', stacked=True, colormap='Set3', ax=ax
 )
 
+# Aggiunta delle percentuali sulle barre
+for container in bars.containers:
+    for bar in container:
+        height = bar.get_height()
+        if height > 0:  # Mostra solo valori significativi
+            ax.annotate(f'{height:.1f}%',
+                        xy=(bar.get_x() + bar.get_width() / 2, bar.get_y() + height / 2),
+                        ha='center', va='center', fontsize=10, color='black')
+
 # Personalizzazione del grafico
-plt.title('Gang con >65% su Victim Country: USA o >25% su un altra Victim Country', fontsize=16)
-plt.xlabel('Gang', fontsize=14)
-plt.ylabel('Percentuale di occorrenze', fontsize=14)
+plt.title('Ransomware Gang che colpiscono principalmente una nazione', fontsize=16)
+plt.xlabel('Ransomware Gang', fontsize=14)
+plt.ylabel('Percentuale di attacchi', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
-plt.legend(title='Victim Country', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.legend(title='Nazione', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.text(x=7.7,y=0,s='Nazioni considerate se:\nUSA > 65%\nOthers > 25%', bbox=dict(facecolor='white', edgecolor='black', boxstyle='round,pad=0.5'))
 plt.tight_layout()
 
 # Salvataggio del grafico
-#plt.savefig('gang_filtered_victim_country_histogram.png')
 plt.show()

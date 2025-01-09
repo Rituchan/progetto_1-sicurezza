@@ -19,8 +19,8 @@ plt.figure(figsize=(10, 6))
 top_20_victims_per_gang.plot(kind='bar', color='skyblue', edgecolor='black')
 
 # Personalizzare il grafico
-plt.title('Numero di vittime uniche per le top 20 gang', fontsize=16)
-plt.xlabel('Gang', fontsize=14)
+plt.title('Top 20 ransomware gang più attive in base al numero di vittime', fontsize=16)
+plt.xlabel('Randomware Gang', fontsize=14)
 plt.ylabel('Numero di vittime uniche', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
 plt.grid(axis='y', linestyle='--', alpha=0.7)
