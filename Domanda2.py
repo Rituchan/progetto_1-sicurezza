@@ -48,17 +48,17 @@ percentage_data = grouped_data.div(total_occurrences, axis=0) * 100
 top_20_gangs = total_occurrences.nlargest(20).index
 filtered_gangs = percentage_data.loc[top_20_gangs]
 
-# Raggruppare i "Victim sectors" con occorrenze inferiori al 10% nella categoria 'Other'
+# Raggruppare i "Victim sectors" con occorrenze inferiori al 5% nella categoria 'Other'
 threshold = 5
 filtered_gangs = filtered_gangs.copy()
 
-# Identificare le colonne che hanno occorrenze inferiori al 10%
+# Identificare le colonne che hanno occorrenze inferiori al 5%
 columns_to_group = filtered_gangs.columns[filtered_gangs.max(axis=0) < threshold]
 
 # Creare una nuova colonna 'Other' che somma i settori 'Victim sectors' con occorrenze < 10%
 filtered_gangs['Other'] = filtered_gangs[columns_to_group].sum(axis=1)
 
-# Rimuovere le colonne con occorrenze inferiori al 10%
+# Rimuovere le colonne con occorrenze inferiori al 5%
 filtered_gangs = filtered_gangs.drop(columns=columns_to_group)
 
 # Assicurarsi che la somma delle percentuali sia 100% per ogni gang
