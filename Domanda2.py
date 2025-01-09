@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
+import seaborn as sns
 
 # Caricamento dei dati
 file_path = 'Dataset.csv'  # Assicurati che il file si trovi nella stessa directory dello script
@@ -24,10 +25,17 @@ below_threshold = percentages[percentages < 2].sum()
 pie_data = above_threshold.copy()
 pie_data['Other (<2%)'] = below_threshold
 
+#una sola palette non è sufficiente per rappresentare tutti
+colors_palette = (sns.color_palette("tab20c") + sns.color_palette("pastel") + sns.color_palette("bright") +
+                 sns.color_palette("dark") + sns.color_palette("colorblind"))# Generazione della palette husl con tanti colori quanti sono i paesi
+palette = sns.color_palette(colors_palette, n_colors=len(above_threshold))
+
+# Aggiungere il colore grigio per "Other (<2%)"
+colors = list(palette) + ['lightgray']  # Ultima fetta "Other (<2%)" in grigio
+
 # Create a pie chart
 plt.figure(figsize=(10, 8))
-colors = plt.cm.tab20.colors[:len(pie_data)-1] + ((0.5, 0.5, 0.5, 1.0),)  # Ensure "Other" is gray
-pie_data.plot(kind='pie', autopct='%1.1f%%', startangle=90, colors=colors)
+pie_data.plot(kind='pie', autopct='%1.1f%%', startangle=90, colors=colors, fontsize=14)
 
 # Customize the chart
 plt.title('Distribuzione degli attacchi in base al settore colpito', fontsize=16)
@@ -75,17 +83,15 @@ filtered_gangs = filtered_gangs.div(filtered_gangs.sum(axis=1), axis=0) * 100
 # Ordinare i dati filtrati per la percentuale massima
 processed_data = filtered_gangs.loc[filtered_gangs.max(axis=1).sort_values(ascending=False).index]
 
-# Definire una colormap personalizzata con grigio per 'Other'
-colors = plt.cm.tab20.colors  # Prendere i colori di tab20
-num_sectors = len(ordered_columns) - 1  # Numero di settori escluso 'Other'
-cmap_colors = list(colors[:num_sectors]) + ['#A9A9A9']  # Aggiungere grigio per 'Other'
-custom_cmap = ListedColormap(cmap_colors)
+
+# Aggiungi un colore personalizzato per la categoria 'Other' (lightgray)
+colors = ['lightgray' if col == 'Other' else sns.color_palette(colors_palette)[i] for i, col in enumerate(processed_data.columns)]
 
 # Plot dei dati filtrati
 fig, ax = plt.subplots(figsize=(14, 8))
 
 bars = processed_data.plot(
-    kind='bar', stacked=True, colormap=custom_cmap, ax=ax
+    kind='bar', stacked=True, color=colors, ax=ax
 )
 
 # Aggiunta delle percentuali sulle barre
