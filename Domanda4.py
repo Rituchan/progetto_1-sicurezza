@@ -94,7 +94,9 @@ highlight_2021 = [
 
 # Date ed etichette da evidenziare per il 2022
 highlight_2022 = [
-    (pd.to_datetime('2022-06-03'), 'CVE-2022-26134 (Atlassian Confluence RCE)')
+    (pd.to_datetime('2022-04-11'), 'CVE-2022-22954'),
+    (pd.to_datetime('2022-06-03'), 'CVE-2022-26134 (Atlassian Confluence RCE)'),
+    (pd.to_datetime('2022-07-17'), 'CVE-2022-26352')
 ]
 
 # Creazione della figura con due subplot disposti verticalmente
