@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MaxNLocator
 
+import seaborn as sns
+
 
 # Funzione per convertire i valori nella colonna 'NumberN/AofN/Aemployees'
 def parse_employee_count(value):
@@ -138,6 +140,74 @@ plt.show()
 
 #######################################################################################
 
+# Filtra le top 10 gang in base al numero di occorrenze
+top_gangs = data['gang'].value_counts().nlargest(10).index
+filtered_data = data[data['gang'].isin(top_gangs)]
+
+# Filtra i dati con "Unknown" eliminati per Victim Country e Victim sectors
+filtered_data = filtered_data[
+    (filtered_data['Victim Country'] != 'Unknown') &
+    (filtered_data['Victim sectors'] != 'Unknown')
+]
+
+# Combina Victim Country e Victim sectors per creare i segmenti
+filtered_data['segment'] = filtered_data['Victim Country'] + ' - ' + filtered_data['Victim sectors']
+
+# Conta le occorrenze per ogni gang e segmento
+segment_counts = filtered_data.groupby(['gang', 'segment']).size().reset_index(name='counts')
+
+# Determina la soglia per la categoria "other" (0.2%)
+total_counts = segment_counts['counts'].sum()
+threshold = total_counts * 0.0015
+
+# Raggruppa i segmenti con occorrenze minori della soglia in "other"
+segment_counts['segment'] = segment_counts.apply(
+    lambda x: 'Other' if x['counts'] < threshold else x['segment'], axis=1
+)
+
+# Riconta i dati dopo il raggruppamento e ordina la categoria "Other" in fondo
+final_counts = segment_counts.groupby(['gang', 'segment'])['counts'].sum().unstack(fill_value=0)
+if 'Other' in final_counts.columns:
+    other_column = final_counts.pop('Other')
+    final_counts['Other'] = other_column
+
+# Ordina le gang in base al totale decrescente delle occorrenze
+final_counts = final_counts.loc[final_counts.sum(axis=1).sort_values(ascending=False).index]
+
+#una sola palette non è sufficiente per rappresentare tutti
+colors_palette = (sns.color_palette("deep") + sns.color_palette("pastel") + sns.color_palette("bright") +
+                 sns.color_palette("dark") + sns.color_palette("colorblind"))# Generazione della palette husl con tanti colori quanti sono i paesi
+palette = sns.color_palette(colors_palette)
+
+# Aggiungi un colore personalizzato per la categoria 'Other' (lightgray)
+colors = ['lightgray' if col == 'Other' else sns.color_palette(colors_palette)[i] for i, col in enumerate(final_counts.columns)]
+
+# Plot dei dati filtrati
+fig, ax = plt.subplots(figsize=(14, 8))
+
+bars = final_counts.plot(
+    kind='bar', stacked=True, color=colors, ax=ax
+)
+
+# Aggiunta delle percentuali sulle barre
+for container in bars.containers:
+    for bar in container:
+        height = bar.get_height()
+        if height > 50:  # Mostra solo valori significativi
+            ax.annotate(f'{height:.0f}',
+                        xy=(bar.get_x() + bar.get_width() / 2, bar.get_y() + height / 2),
+                        ha='center', va='center', fontsize=9, color='black')
+
+# Configurazione del grafico
+plt.title('Attacchi delle 10 ransomware gang più attive in relazione a nazioni e settori colpiti')
+plt.xlabel('Ransomware Gang')
+plt.ylabel('Numero di attacchi')
+plt.legend(title='Nazione + Settore', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.tight_layout()
+plt.show()
+
+#######################################################################################
+
 # Contiamo le occorrenze per la colonna 'gang'
 victim_counts = data['victim'].value_counts()
 
@@ -154,12 +224,14 @@ attack_groups_percentage = (attack_groups / total_attacks) * 100
 # Creiamo una figura con due sottotrame (subplots)
 fig, axes = plt.subplots(2, 1, figsize=(12, 12))
 
-# Primo istogramma: Vittime colpite più di 2 volte (orizzontale)
+
+# Primo istogramma: Vittime colpite più di 2 volte
 top_victims.plot(kind='barh', color='orange', edgecolor='black', ax=axes[0])
 axes[0].set_title('Vittime colpite più di 2 volte', fontsize=16)
-axes[0].set_xlabel('Vittime', fontsize=14)
-axes[0].set_ylabel('Numero di attacchi', fontsize=14)
-axes[0].xaxis.set_major_locator(MaxNLocator(integer=True)) # Impostare l'asse X per visualizzare solo numeri interi
+axes[0].set_ylabel('Vittime', fontsize=14)
+axes[0].set_xlabel('Numero di attacchi subiti', fontsize=14)
+axes[0].xaxis.set_major_locator(MaxNLocator(integer=True))
+
 
 # Secondo istogramma: Distribuzione delle percentuali (orizzontale)
 bars = axes[1].barh(attack_groups_percentage.index, attack_groups_percentage, color='steelblue', edgecolor='black')
@@ -170,6 +242,7 @@ for bar in bars:
 axes[1].set_title('Distribuzione delle vittime in base alla percentuale di attacchi subiti', fontsize=16)
 axes[1].set_xlabel('Numero di attacchi subiti', fontsize=14)
 axes[1].set_ylabel('Percentuale di attacchi (%)', fontsize=14)
+axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
 
 # Adattiamo i layout per evitare sovrapposizioni
 plt.tight_layout()
