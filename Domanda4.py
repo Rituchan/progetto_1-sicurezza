@@ -55,75 +55,79 @@ plt.show()
 
 #######################################################################
 
-# Conversione della colonna "date" in datetime
-df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 
-# Pulizia dei dati
-# Rimuovere colonne completamente vuote
-data_cleaned = df.dropna(how="all", axis=1)
+# Dataset di esempio (sostituisci con il tuo dataset)
+file_path = 'Dataset.csv'
+data = pd.read_csv(file_path, sep=';')
 
-# Rimuovere righe con date non valide
-data_filtered = data_cleaned.dropna(subset=["date"])
+# Funzione per convertire date con formati multipli
+def parse_dates(date):
+    for fmt in ('%d/%m/%Y', '%Y-%m-%d %H:%M:%S'):
+        try:
+            return pd.to_datetime(date, format=fmt)
+        except ValueError:
+            continue
+    return None  # Restituisci None se nessun formato è valido
 
-# Creare una colonna per il mese e l'anno
-data_filtered = data_filtered.copy()
-data_filtered["year_month"] = data_filtered["date"].dt.to_period("M")
+# Pre-elaborazione dei dati
+data['date'] = data['date'].str.strip()
+data['date'] = data['date'].apply(parse_dates)
+data = data.dropna(subset=['date'])  # Rimuovi righe con date non valide
 
+# Filtra i dati per il 2021 e 2022
+data_2021 = data[data['date'].dt.year == 2021]
+date_counts_2021 = data_2021['date'].value_counts().sort_index()
 
-# Aggregare le attività delle gang per mese
-activity_by_month = data_filtered.groupby("year_month").size()
+data_2022 = data[data['date'].dt.year == 2022]
+date_counts_2022 = data_2022['date'].value_counts().sort_index()
 
-# Convertire a DataFrame per la visualizzazione
-activity_by_month_df = activity_by_month.reset_index(name="activity_count")
+# Date ed etichette da evidenziare per il 2021
+highlight_2021 = [
+    (pd.to_datetime('2021-03-03'), 'CVE-2021-26855 (ProxyLogon)'),
+    (pd.to_datetime('2021-04-23'), 'CVE-2021-22893'),
+    (pd.to_datetime('2021-07-02'), 'CVE-2021-34527 (PrintNightmare)'),
+    (pd.to_datetime('2021-12-10'), 'CVE-2021-44228 (Log4Shell)')
+]
 
-# Eventi geopolitici chiave
-updated_key_events = {
-    "2020-11": "CVE-2020-1472 (ZeroLogon)",
-    "2021-04": "CVE-2021-22893",
-    "2021-07": "CVE-2021-34527 (PrintNightmare)",
-    "2021-10": "CVE-2021-44228 (Log4Shell)",
-    "2022-06": "CVE-2022-26134",
-    "2023-01": "CVE-2022-47966",
-    "2023-04": "CVE-2023-27350",
-    "2024-09": "CVE-2024-40711",
-    "2024-11": "CVE-2024-51378",
-}
+# Date ed etichette da evidenziare per il 2022
+highlight_2022 = [
+    (pd.to_datetime('2022-06-03'), 'CVE-2022-26134 (Atlassian Confluence RCE)')
+]
 
-# Creazione del grafico con aggiunta della griglia grigia per migliorare la leggibilità
-plt.figure(figsize=(15, 10))
-plt.plot(
-    activity_by_month_df["year_month"].astype(str),
-    activity_by_month_df["activity_count"],
-    label="Attacchi",
-    color="blue",
-    linewidth=2,
-)
+# Creazione della figura con due subplot disposti verticalmente
+fig, axes = plt.subplots(2, 1, figsize=(16, 14))
 
-# Aggiunta delle linee verticali per gli eventi con il testo ingrandito
-for event_date, event_name in updated_key_events.items():
-    plt.axvline(x=event_date, color="red", linestyle="--", alpha=0.7)
-    plt.text(
-        event_date,
-        max(activity_by_month_df["activity_count"]) / 2,  # Posizionare le scritte al centro
-        event_name,
-        rotation=90,
-        horizontalalignment="center",
-        fontsize=12,  # Testo più grande
-        fontweight="bold",  # Aggiunto grassetto per leggibilità
-        color="black",
-    )
+# Primo plot: 2021
+axes[0].plot(date_counts_2021.index, date_counts_2021.values, linestyle='-')
+for date, label in highlight_2021:
+    axes[0].axvline(x=date, color='orange', linestyle='--')
+    axes[0].text(date, max(date_counts_2021.values) / 2, label, color='black',
+                 rotation=90, fontsize=12, ha='right', va='center', fontweight="bold")
+axes[0].set_title('Attacchi ransomware - 2021', fontsize=14)
+axes[0].set_xlabel('Mesi - 2021', fontsize=12)
+axes[0].set_ylabel('Numero di attacchi', fontsize=12)
+axes[0].grid(True)
+axes[0].xaxis.set_major_locator(mdates.MonthLocator())
+axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+axes[0].tick_params(axis='x', rotation=90)
 
-# Aggiunta della griglia grigia
-plt.grid(color="gray", linestyle="--", linewidth=0.5, alpha=0.7)
+# Secondo plot: 2022
+axes[1].plot(date_counts_2022.index, date_counts_2022.values, linestyle='-')
+for date, label in highlight_2022:
+    axes[1].axvline(x=date, color='orange', linestyle='--')
+    axes[1].text(date, max(date_counts_2022.values) / 2, label, color='black',
+                 rotation=90, fontsize=12, ha='right', va='center', fontweight="bold")
+axes[1].set_title('Attacchi ransomware - 2022', fontsize=14)
+axes[1].set_xlabel('Mesi - 2022', fontsize=12)
+axes[1].set_ylabel('Numero di attacchi', fontsize=12)
+axes[1].grid(True)
+axes[1].xaxis.set_major_locator(mdates.MonthLocator())
+axes[1].xaxis.set_major_formatter(mdates.DateFormatter('%b'))
+axes[1].tick_params(axis='x', rotation=90)
 
-# Dettagli del grafico
-plt.title("Attacchi ransomware in relazione alle CVE critiche degli ultimi anni", fontsize=18)
-plt.xlabel("Anno-Mese", fontsize=14)
-plt.ylabel("Numero di attacchi", fontsize=14)
-plt.xticks(rotation=90, fontsize=12)
-plt.yticks(fontsize=12)
-plt.legend(fontsize=12)
+# Layout finale
 plt.tight_layout()
-
-# Mostrare il grafico
 plt.show()
