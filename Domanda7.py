@@ -27,7 +27,7 @@ def custom_date_formatter_vertical(x, pos):
 
 # Plot the line graph with slightly lighter vertical grid lines for the start of each year
 plt.figure(figsize=(12, 6))
-plt.plot(weekly_counts.index, weekly_counts.values, marker='o', linestyle='-')
+plt.plot(weekly_counts.index, weekly_counts.values, linestyle='-')
 plt.title('Distribuzione degli attacchi nel tempo', fontsize=16)
 plt.xlabel('Settimana', fontsize=12)
 plt.ylabel('Numero di attacchi', fontsize=12)

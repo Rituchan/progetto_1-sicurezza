@@ -9,8 +9,11 @@ data = pd.read_csv(file_path, delimiter=';')
 # Pulizia dei dati: rimuovere eventuali valori nulli nella colonna "Victim Country"
 data = data.dropna(subset=['Victim Country', 'gang'])
 
+# Raggruppamento dei dati per "victim" e selezione dell'ultima occorrenza
+unique_victims = data.groupby('victim').last().reset_index()
+
 # Conteggio delle occorrenze per "Victim Country"
-country_counts = data['Victim Country'].value_counts()
+country_counts = unique_victims['Victim Country'].value_counts()
 
 # Calcolo delle percentuali
 total_count = country_counts.sum()
@@ -34,45 +37,37 @@ colors = list(palette) + ['lightgray']  # Ultima fetta "Other (<2%)" in grigio
 pie_data.plot(kind='pie', autopct='%1.1f%%', startangle=90, colors=colors)
 
 # Personalizzazione del grafico
-plt.title('Distribuzione attacchi in base alla nazione colpita', fontsize=16)
+plt.title('Distribuzione delle vittime in base alla nazionalità', fontsize=16)
 plt.ylabel('')  # Rimuovere etichetta dell'asse Y
 plt.tight_layout()
 
 # Salvataggio del grafico
 plt.show()
 
-
 #######################################################################
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 
-# Caricamento dei dati
-file_path = 'Dataset.csv'  # Assicurati che il file si trovi nella stessa directory dello script
-data = pd.read_csv(file_path, delimiter=';')
+# Filtrare le gang con almeno 10 occorrenze prima della normalizzazione
+total_occurrences = data.groupby('gang').size()
+over_100_gangs = total_occurrences[total_occurrences >= 10].index
+filtered_data = data[data['gang'].isin(over_100_gangs)]
 
 # Conteggio delle occorrenze per Gang e Victim Country
-grouped_data = data.groupby(['gang', 'Victim Country']).size().unstack(fill_value=0)
+grouped_data = filtered_data.groupby(['gang', 'Victim Country']).size().unstack(fill_value=0)
 
 # Calcolo delle percentuali
-total_occurrences = grouped_data.sum(axis=1)
-percentage_data = grouped_data.div(total_occurrences, axis=0) * 100
+percentage_data = grouped_data.div(grouped_data.sum(axis=1), axis=0) * 100
 
-over_100_gangs = total_occurrences[total_occurrences >= 30].index
-gangs_filtered = percentage_data.loc[over_100_gangs]
-
-# Filtrare le gang con percentuale > 65% su Victim Country: USA e > 25% su un'altra singola Victim Country
-usa_filter = gangs_filtered['USA'] > 70
-other_country_filter = (gangs_filtered.drop(columns=['USA']).max(axis=1) > 25)
-filtered_gangs = gangs_filtered[(usa_filter) | (other_country_filter)]
-
+# Filtrare le gang con percentuale > 80% su Victim Country: USA e > 50% su un'altra singola Victim Country
+usa_filter = percentage_data['USA'] > 80
+other_country_filter = (percentage_data.drop(columns=['USA']).max(axis=1) > 50)
+filtered_gangs = percentage_data[(usa_filter) | (other_country_filter)]
 
 # Aggiungere la categoria "other"
 def process_gang(row):
     usa_percentage = row['USA']
     other_countries = row.drop(labels=['USA'])
     top_percentage = other_countries.max()
-    if top_percentage < 25:
+    if top_percentage < 50:
         other_percentage = 100 - usa_percentage
         return pd.Series({
             'USA': usa_percentage,
@@ -80,13 +75,11 @@ def process_gang(row):
         })
     else:
         top_country = other_countries.idxmax()
-        other_percentage = 100 - (usa_percentage + top_percentage)
+        other_percentage = 100 - top_percentage
         return pd.Series({
-            'USA': usa_percentage,
             top_country: top_percentage,
             'other': other_percentage
         })
-
 
 processed_data = filtered_gangs.apply(process_gang, axis=1)
 
@@ -121,7 +114,7 @@ plt.xlabel('Ransomware Gang', fontsize=14)
 plt.ylabel('Percentuale di attacchi', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
 plt.legend(title='Nazione', bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.text(x=15, y=0, s='Nazioni considerate se:\nUSA > 70%\nOthers > 25%',
+plt.text(x=9.7, y=0, s='Nazioni considerate se:\nUSA > 80%\nOPPURE\nAltre nazioni > 50%',
          bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.2'))
 plt.tight_layout()
 

@@ -117,8 +117,8 @@ fig, axes = plt.subplots(2, 1, figsize=(12, 12))
 # Primo istogramma: distribuzione del numero di dipendenti (orizzontale)
 bars1 = axes[0].barh(group_labels, group_counts, color='purple', alpha=0.7, edgecolor='black')
 axes[0].set_title('Distribuzione degli attacchi in base al numero di dipendenti', fontsize=14)
-axes[0].set_xlabel('Numero di dipendenti', fontsize=12)
-axes[0].set_ylabel('Attacchi', fontsize=12)
+axes[0].set_xlabel('Numero di attacchi', fontsize=12)
+axes[0].set_ylabel('Numero di dipendenti', fontsize=12)
 axes[0].grid(axis='x', linestyle='--', alpha=0.7)
 for bar in bars1:
     width = bar.get_width()
@@ -127,8 +127,8 @@ for bar in bars1:
 # Secondo istogramma: distribuzione delle vendite (orizzontale)
 bars2 = axes[1].barh(group_labels2, group_counts2, color='green', alpha=0.7, edgecolor='black')
 axes[1].set_title('Distribuzione degli attacchi in base al fatturato', fontsize=14)
-axes[1].set_xlabel('Fatturato (in milioni)', fontsize=12)
-axes[1].set_ylabel('Attacchi', fontsize=12)
+axes[1].set_xlabel('Numero di attacchi', fontsize=12)
+axes[1].set_ylabel('Fatturato (in milioni)', fontsize=12)
 axes[1].grid(axis='x', linestyle='--', alpha=0.7)
 for bar in bars2:
     width = bar.get_width()
@@ -224,7 +224,6 @@ attack_groups_percentage = (attack_groups / total_attacks) * 100
 # Creiamo una figura con due sottotrame (subplots)
 fig, axes = plt.subplots(2, 1, figsize=(12, 12))
 
-
 # Primo istogramma: Vittime colpite più di 2 volte
 top_victims.plot(kind='barh', color='orange', edgecolor='black', ax=axes[0])
 axes[0].set_title('Vittime colpite più di 2 volte', fontsize=16)
@@ -232,12 +231,11 @@ axes[0].set_ylabel('Vittime', fontsize=14)
 axes[0].set_xlabel('Numero di attacchi subiti', fontsize=14)
 axes[0].xaxis.set_major_locator(MaxNLocator(integer=True))
 
-
-# Secondo istogramma: Distribuzione delle percentuali (orizzontale)
-bars = axes[1].barh(attack_groups_percentage.index, attack_groups_percentage, color='steelblue', edgecolor='black')
+# Secondo istogramma: Distribuzione delle percentuali
+bars = axes[1].bar(attack_groups_percentage.index, attack_groups_percentage, color='steelblue', edgecolor='black')
 for bar in bars:
-    width = bar.get_width()
-    axes[1].text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}%', ha='left', va='center', fontsize=10)
+    height = bar.get_height()
+    axes[1].text(bar.get_x() + bar.get_width() / 2, height, f'{height:.2f}%', ha='center', va='bottom', fontsize=10)
 
 axes[1].set_title('Distribuzione delle vittime in base alla percentuale di attacchi subiti', fontsize=16)
 axes[1].set_xlabel('Numero di attacchi subiti', fontsize=14)
