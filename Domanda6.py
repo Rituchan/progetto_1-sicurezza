@@ -48,7 +48,7 @@ filtered_countries_percentage = filtered_countries.div(filtered_countries.sum(ax
 processed_data = filtered_countries_percentage.loc[filtered_countries.sum(axis=1).sort_values(ascending=False).index]
 
 # Definire una colormap personalizzata con grigio per 'Other'
-colors = plt.cm.tab20c.colors  # Prendere i colori di tab20
+colors = plt.cm.tab20.colors  # Prendere i colori di tab20
 num_sectors = len(ordered_columns) - 1  # Numero di settori escluso 'Other'
 cmap_colors = list(colors[:num_sectors]) + ['#A9A9A9']  # Aggiungere grigio per 'Other'
 custom_cmap = ListedColormap(cmap_colors)

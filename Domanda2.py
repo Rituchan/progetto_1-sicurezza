@@ -26,7 +26,7 @@ pie_data = above_threshold.copy()
 pie_data['Other (<2%)'] = below_threshold
 
 #una sola palette non è sufficiente per rappresentare tutti
-colors_palette = (sns.color_palette("tab20c") + sns.color_palette("pastel") + sns.color_palette("bright") +
+colors_palette = (sns.color_palette("deep") + sns.color_palette("pastel") + sns.color_palette("bright") +
                  sns.color_palette("dark") + sns.color_palette("colorblind"))# Generazione della palette husl con tanti colori quanti sono i paesi
 palette = sns.color_palette(colors_palette, n_colors=len(above_threshold))
 
