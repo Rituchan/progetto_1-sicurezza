@@ -20,7 +20,6 @@ data_filtered = data_cleaned.dropna(subset=["date"])
 data_filtered = data_filtered.copy()
 data_filtered["year_month"] = data_filtered["date"].dt.to_period("M")
 
-
 # Aggregare le attività delle gang per mese
 activity_by_month = data_filtered.groupby("year_month").size()
 
@@ -38,7 +37,20 @@ updated_key_events = {
     "2024-11": "Elezioni presidenziali USA",
 }
 
-# Creazione del grafico con aggiunta della griglia grigia per migliorare la leggibilità
+# Mappare i numeri dei mesi ai nomi abbreviati
+month_names = {
+    "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr",
+    "05": "May", "06": "Jun", "07": "Jul", "08": "Aug",
+    "09": "Sep", "10": "Oct", "11": "Nov", "12": "Dec",
+}
+
+# Generare etichette personalizzate per l'asse x
+xticks = [
+    period[:4] if period.endswith("-01") else month_names[period[5:]]
+    for period in activity_by_month_df["year_month"].astype(str)
+]
+
+# Creazione del grafico
 plt.figure(figsize=(15, 10))
 plt.plot(
     activity_by_month_df["year_month"].astype(str),
@@ -48,29 +60,33 @@ plt.plot(
     linewidth=2,
 )
 
-# Aggiunta delle linee verticali per gli eventi con il testo ingrandito
+# Aggiungere le linee verticali per gli eventi
 for event_date, event_name in updated_key_events.items():
     plt.axvline(x=event_date, color="red", linestyle="--", alpha=0.7)
     plt.text(
         event_date,
-        max(activity_by_month_df["activity_count"]) / 2,  # Posizionare le scritte al centro
+        max(activity_by_month_df["activity_count"]) / 2,
         event_name,
         rotation=90,
-        horizontalalignment="center",
-        fontsize=12,  # Testo più grande
-        fontweight="bold",  # Aggiunto grassetto per leggibilità
+        horizontalalignment="right",
+        fontsize=12,
+        fontweight="bold",
         color="black",
     )
 
-# Aggiunta della griglia grigia
-plt.grid(color="gray", linestyle="--", linewidth=0.5, alpha=0.7)
+# Applicare le etichette personalizzate all'asse x
+plt.xticks(
+    ticks=range(len(xticks)),
+    labels=xticks,
+    rotation=90,
+    fontsize=12,
+)
 
 # Dettagli del grafico
+plt.grid(color="gray", linestyle="--", linewidth=0.5, alpha=0.7)
 plt.title("Attacchi ransomware in relazione ai principali eventi geopolitici", fontsize=18)
 plt.xlabel("Anno-Mese", fontsize=14)
 plt.ylabel("Numero di attacchi", fontsize=14)
-plt.xticks(rotation=90, fontsize=12)
-plt.yticks(fontsize=12)
 plt.legend(fontsize=12)
 plt.tight_layout()
 
