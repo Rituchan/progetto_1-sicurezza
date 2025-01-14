@@ -99,8 +99,7 @@ plt.show()
 def country_to_flag(country):
     return country.strip().upper()[:2]
 
-
-# Carica il file CSV
+# Caricamento del file CSV
 file_path = 'Updated_Dataset.csv'  # Sostituisci con il percorso del tuo file
 data = pd.read_csv(file_path, sep=',', engine='python', on_bad_lines='skip')
 
@@ -126,23 +125,21 @@ gang_victim_counts = data_filtered.groupby(['Gang name', 'Victim Country']).size
 # Normalizza i dati in percentuali per ogni gang
 gang_victim_percentages = gang_victim_counts.div(gang_victim_counts.sum(axis=1), axis=0) * 100
 
-# Trova la percentuale massima per ciascuna gang
-max_percentages_per_gang = gang_victim_percentages.max(axis=1)
+# Conta il numero totale di nazioni attaccate per ogni gang
+total_countries_attacked = (gang_victim_counts > 0).sum(axis=1)
 
-# Seleziona le top 20 gang in base alla percentuale massima
-top_20_gangs = max_percentages_per_gang.nlargest(20).index
+# Filtra le gang che attaccano un massimo di 10 nazioni
+gangs_max_10_countries = total_countries_attacked[total_countries_attacked < 8]
 
-# Filtra i dati normalizzati per queste gang
-filtered_percentages = gang_victim_percentages.loc[top_20_gangs]
+# Riordina le gang in base al numero totale di nazioni attaccate (crescentemente)
+ordered_gangs_total = gangs_max_10_countries.sort_values().index
 
-# Identifica le colonne con percentuali inferiori al 5%
-low_percentage_columns = filtered_percentages.columns[filtered_percentages.max(axis=0) < 5]
+# Filtra e riordina le percentuali
+filtered_percentages_total = gang_victim_percentages.loc[ordered_gangs_total]
 
-# Somma queste colonne e aggiungile come "Other"
-filtered_percentages['Other'] = filtered_percentages[low_percentage_columns].sum(axis=1)
-
-# Rimuovi le colonne con percentuali inferiori al 5%
-filtered_percentages = filtered_percentages.drop(columns=low_percentage_columns)
+# Identifica le nazioni che effettivamente compaiono nel grafico (almeno un valore > 0)
+countries_in_graph = filtered_percentages_total.columns[(filtered_percentages_total > 0).any(axis=0)]
+countries_in_graph = countries_in_graph.tolist()
 
 # Aggiungi le bandiere accanto ai nomi delle gang
 data_filtered['Gang-Country'] = data_filtered['Gang name'] + " (" + data_filtered['Country of Origin'] + ")"
@@ -150,17 +147,15 @@ gang_country_flags = {
     gang: f"{gang} {country_to_flag(origin)}"
     for gang, origin in data_filtered.set_index('Gang name')['Country of Origin'].to_dict().items()
 }
-filtered_percentages.index = filtered_percentages.index.map(gang_country_flags)
-
-# Numero di categorie (inclusa "Other")
-num_colors = len(filtered_percentages.columns)
-
-# Generazione della palette `deep` e aggiunta del grigio
-palette = sns.color_palette("pastel", num_colors - 1)  # Palette `deep` per le categorie
-custom_colors = list(palette) + ['darkgray']  # Aggiungi il grigio per "Other"
+filtered_percentages_total.index = filtered_percentages_total.index.map(gang_country_flags)
 
 # Creazione del grafico
-ax = filtered_percentages.plot(
+colors_palette = (sns.color_palette("dark") + sns.color_palette("deep") + sns.color_palette("pastel") +
+                 sns.color_palette("dark") + sns.color_palette("colorblind"))# Generazione della palette husl con tanti colori quanti sono i paesi
+
+custom_colors = colors_palette[:len(countries_in_graph)]  # Usa solo i colori per le nazioni presenti
+
+ax = filtered_percentages_total[countries_in_graph].plot(
     kind='bar',
     stacked=True,
     figsize=(15, 7),
@@ -171,7 +166,7 @@ ax = filtered_percentages.plot(
 for bar_group in ax.containers:
     for bar in bar_group:
         height = bar.get_height()
-        if height > 5:  # Mostra solo le percentuali > 5%
+        if height > 3:  # Mostra solo le percentuali > 5%
             ax.text(
                 bar.get_x() + bar.get_width() / 2,
                 bar.get_y() + height / 2,
@@ -183,11 +178,20 @@ for bar_group in ax.containers:
             )
 
 # Personalizzazione del grafico
-plt.title('Correlazione tra nazione di origine della ransomware gang e nazioni attaccate', fontsize=16)
-plt.xlabel('Ransomware Gang (Nazione di origine)', fontsize=12)
+plt.title('Distribuzione degli attacchi delle ransomware gang che prendono di mira al massimo 7 nazioni', fontsize=16)
+plt.xlabel('Ransomware Gang', fontsize=12)
 plt.ylabel('% Attacchi', fontsize=12)
 plt.xticks(rotation=45, ha='right')
-plt.legend(title='Nazione', bbox_to_anchor=(1.05, 1), loc='upper left')
+
+# Ricrea la legenda solo con le nazioni presenti
+plt.legend(
+    handles=ax.get_legend_handles_labels()[0],
+    labels=countries_in_graph,
+    title='Nazione',
+    bbox_to_anchor=(1.05, 1),
+    loc='upper left'
+)
+
 plt.tight_layout()
 
 # Mostra il grafico

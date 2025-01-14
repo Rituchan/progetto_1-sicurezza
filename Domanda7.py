@@ -52,6 +52,10 @@ plt.show()
 
 df = data
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 # Supponiamo che le colonne si chiamino 'date' e 'gang' (aggiorna se necessario)
 date_column = 'date'
 gang_column = 'gang'
@@ -65,6 +69,9 @@ df = df[df[date_column] >= '2023-01-01'].copy()
 # Estrai i mesi e gli anni dalla colonna delle date
 df['month_year'] = df[date_column].dt.to_period('M')
 
+# Genera un intervallo completo di mesi dal 2023-01 fino al mese più recente
+all_months = pd.period_range(start='2023-01', end=df['month_year'].max(), freq='M')
+
 # Raggruppa i dati per mese-anno e gang
 agg_data = df.groupby(['month_year', gang_column]).size().reset_index(name='occurrences')
 
@@ -74,8 +81,11 @@ agg_data = agg_data[agg_data['occurrences'] > 50]
 # Riorganizza i dati in formato pivot per lo stack delle barre
 pivot_data = agg_data.pivot(index='month_year', columns=gang_column, values='occurrences').fillna(0)
 
+# Aggiungi i mesi mancanti al pivot
+pivot_data = pivot_data.reindex(all_months, fill_value=0)
+
 # Configura la palette dei colori
-palette = sns.color_palette('husl', n_colors=len(pivot_data.columns))
+palette = sns.color_palette('pastel', n_colors=len(pivot_data.columns))
 
 # Crea l'istogramma a barre impilate
 ax = pivot_data.plot(kind='bar', stacked=True, figsize=(14, 7), color=palette, edgecolor='black')
@@ -89,11 +99,11 @@ plt.title('Ransomware Gang che hanno commesso più di 50 attacchi in un mese (da
 plt.xlabel('Mese', fontsize=12)
 plt.ylabel('Numero di attacchi', fontsize=12)
 plt.legend(title='Ransomware Gang')
-plt.xticks(rotation=45)
+plt.xticks(ticks=range(len(all_months)), labels=[m.strftime('%b %Y') for m in all_months], rotation=45)
 
 # Migliora il layout
 plt.tight_layout()
 
-# Mostra il grafico
+#
 plt.show()
 

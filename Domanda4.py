@@ -59,8 +59,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
-# Dataset di esempio (sostituisci con il tuo dataset)
-file_path = 'Dataset.csv'
+# Caricamento del dataset
+file_path = 'Dataset.csv'  # Sostituire con il percorso corretto se necessario
 data = pd.read_csv(file_path, sep=';')
 
 # Funzione per convertire date con formati multipli
@@ -77,59 +77,67 @@ data['date'] = data['date'].str.strip()
 data['date'] = data['date'].apply(parse_dates)
 data = data.dropna(subset=['date'])  # Rimuovi righe con date non valide
 
-# Filtra i dati per il 2021 e 2022
-data_2021 = data[data['date'].dt.year == 2021]
-date_counts_2021 = data_2021['date'].value_counts().sort_index()
+# Definizione delle date di CVE e di due date casuali
+highlight_dates = {
+    '2021': [
+        (pd.to_datetime('2021-03-03'), 'CVE-2021-26855 (ProxyLogon)'),
+        (pd.to_datetime('2021-04-23'), 'CVE-2021-22893'),
+        (pd.to_datetime('2021-07-02'), 'CVE-2021-34527 (PrintNightmare)')
+    ],
+    '2022': [
+        (pd.to_datetime('2022-04-11'), 'CVE-2022-22954'),
+        (pd.to_datetime('2022-06-03'), 'CVE-2022-26134 (Atlassian Confluence RCE)'),
+        (pd.to_datetime('2022-07-17'), 'CVE-2022-26352')
+    ],
+    '2023': [
+        (pd.to_datetime('2023-03-12'), 'CVE-2023-48788')
+    ],
+    '2024': [
+        (pd.to_datetime('2024-01-24'), 'CVE-2024-23897'),
+        (pd.to_datetime('2024-02-21'), 'CVE-2024-1709')
+    ]
+}
 
-data_2022 = data[data['date'].dt.year == 2022]
-date_counts_2022 = data_2022['date'].value_counts().sort_index()
+# Creazione della griglia 3x3
+fig, axes = plt.subplots(3, 3, figsize=(18, 18))
+axes = axes.flatten()
 
-# Date ed etichette da evidenziare per il 2021
-highlight_2021 = [
-    (pd.to_datetime('2021-03-03'), 'CVE-2021-26855 (ProxyLogon)'),
-    (pd.to_datetime('2021-04-23'), 'CVE-2021-22893'),
-    (pd.to_datetime('2021-07-02'), 'CVE-2021-34527 (PrintNightmare)'),
-    (pd.to_datetime('2021-12-10'), 'CVE-2021-44228 (Log4Shell)')
-]
+# Indicizzazione dei subplot
+plot_index = 0
 
-# Date ed etichette da evidenziare per il 2022
-highlight_2022 = [
-    (pd.to_datetime('2022-04-11'), 'CVE-2022-22954'),
-    (pd.to_datetime('2022-06-03'), 'CVE-2022-26134 (Atlassian Confluence RCE)'),
-    (pd.to_datetime('2022-07-17'), 'CVE-2022-26352')
-]
+for year, highlights in highlight_dates.items():
+    for cve_date, label in highlights:
+        # Definizione del range di ±7 giorni attorno alla data della CVE
+        start_date = cve_date - pd.Timedelta(days=7)
+        end_date = cve_date + pd.Timedelta(days=7)
 
-# Creazione della figura con due subplot disposti verticalmente
-fig, axes = plt.subplots(2, 1, figsize=(16, 14))
+        # Filtraggio dei dati nel range
+        data_range = data[(data['date'] >= start_date) & (data['date'] <= end_date)]
+        date_counts = data_range['date'].value_counts().sort_index()
 
-# Primo plot: 2021
-axes[0].plot(date_counts_2021.index, date_counts_2021.values, linestyle='-')
-for date, label in highlight_2021:
-    axes[0].axvline(x=date, color='orange', linestyle='--')
-    axes[0].text(date, max(date_counts_2021.values) / 2, label, color='black',
-                 rotation=90, fontsize=12, ha='right', va='center', fontweight="bold")
-axes[0].set_title('Attacchi ransomware - 2021', fontsize=14)
-axes[0].set_xlabel('Mesi - 2021', fontsize=12)
-axes[0].set_ylabel('Numero di attacchi', fontsize=12)
-axes[0].grid(True)
-axes[0].xaxis.set_major_locator(mdates.MonthLocator())
-axes[0].xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-axes[0].tick_params(axis='x', rotation=90)
+        # Creazione del grafico
+        ax = axes[plot_index]
+        ax.plot(date_counts.index, date_counts.values, linestyle='-', marker='o')
+        ax.axvline(x=cve_date, color='orange', linestyle='--', label=label)
 
-# Secondo plot: 2022
-axes[1].plot(date_counts_2022.index, date_counts_2022.values, linestyle='-')
-for date, label in highlight_2022:
-    axes[1].axvline(x=date, color='orange', linestyle='--')
-    axes[1].text(date, max(date_counts_2022.values) / 2, label, color='black',
-                 rotation=90, fontsize=12, ha='right', va='center', fontweight="bold")
-axes[1].set_title('Attacchi ransomware - 2022', fontsize=14)
-axes[1].set_xlabel('Mesi - 2022', fontsize=12)
-axes[1].set_ylabel('Numero di attacchi', fontsize=12)
-axes[1].grid(True)
-axes[1].xaxis.set_major_locator(mdates.MonthLocator())
-axes[1].xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-axes[1].tick_params(axis='x', rotation=90)
+        # Imposta il titolo con mese e anno
+        ax.set_title(f"{label}", fontsize=12)
+
+        # Modifica l'asse X per mostrare mese e giorno
+        ax.set_xlabel('Mese-Giorno', fontsize=10)
+        ax.xaxis.set_major_locator(mdates.DayLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
+        ax.set_ylabel('Numero di attacchi', fontsize=10)
+        ax.grid(True)
+        ax.tick_params(axis='x', rotation=90)
+        ax.legend(fontsize=8)
+        plot_index += 1
+
+# Disattivazione dei subplot inutilizzati
+for idx in range(plot_index, len(axes)):
+    axes[idx].axis('off')
 
 # Layout finale
 plt.tight_layout()
 plt.show()
+
