@@ -12,6 +12,7 @@ data = data.dropna(subset=['Victim sectors', 'gang'])
 
 # Count occurrences in "Victim sectors"
 sector_counts = data['Victim sectors'].value_counts()
+sector_counts.to_csv('2_Attacks_by_sector.csv', header=['Count'], index_label='Sector')
 
 # Calculate percentages
 total_count = sector_counts.sum()
@@ -46,8 +47,10 @@ plt.tight_layout()
 plt.show()
 
 #######################################################################
+
 # Conteggio delle occorrenze per Gang e Victim sectors
 grouped_data = data.groupby(['gang', 'Victim sectors']).size().unstack(fill_value=0)
+grouped_data.to_csv('2_Gang_attacks_by_sector.csv')
 
 # Calcolo delle percentuali
 total_occurrences = grouped_data.sum(axis=1)

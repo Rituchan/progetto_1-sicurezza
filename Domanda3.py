@@ -11,6 +11,7 @@ data = data.dropna(subset=['gang'])
 
 # Contare il numero di vittime uniche per ogni gang
 victims_per_gang = data.groupby('gang')['victim'].nunique()
+victims_per_gang.sort_values(ascending=False).to_csv('3_Victims_by_gang.csv', header=['Unique Victims'])
 
 # Selezionare solo le top 20 gang con più vittime uniche
 top_20_victims_per_gang = victims_per_gang.sort_values(ascending=False).head(20)

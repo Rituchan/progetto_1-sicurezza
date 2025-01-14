@@ -103,6 +103,7 @@ group_limits = [0, 25, 90, 200, 1000, 10000, 1500000]
 group_labels = [f'{group_limits[i]}-{group_limits[i+1]}' for i in range(len(group_limits) - 1)]
 data['Group'] = pd.cut(valid_counts, bins=group_limits, labels=group_labels, include_lowest=True)
 group_counts = data['Group'].value_counts().sort_index()
+group_counts.to_csv('5_Attacks_by_employees.csv', header=['Number of Attacks'], index_label='# Employees')
 
 # Configurazione dei dati per il secondo istogramma
 # Raggruppiamo le vendite
@@ -110,6 +111,7 @@ group_limits2 = [0, 10, 30, 100, 500, 1000, 501000]
 group_labels2 = [f'{group_limits2[i]}-{group_limits2[i+1]}' for i in range(len(group_limits2) - 1)]
 data['Group2'] = pd.cut(sales_numeric, bins=group_limits2, labels=group_labels2, include_lowest=True)
 group_counts2 = data['Group2'].value_counts().sort_index()
+group_counts2.to_csv('5_Attacks_by_revenue.csv', header=['Number of Attacks'], index_label='Revenue (in millions)')
 
 # Creazione della figura con due sottotrame
 fig, axes = plt.subplots(2, 1, figsize=(12, 12))
@@ -126,9 +128,9 @@ for bar in bars1:
 
 # Secondo istogramma: distribuzione delle vendite (orizzontale)
 bars2 = axes[1].barh(group_labels2, group_counts2, color='green', alpha=0.7, edgecolor='black')
-axes[1].set_title('Distribution of attacks based on turnover', fontsize=14)
+axes[1].set_title('Distribution of attacks based on revenue', fontsize=14)
 axes[1].set_xlabel('# Attacks', fontsize=12)
-axes[1].set_ylabel('Turnover (in millions)', fontsize=12)
+axes[1].set_ylabel('Revenue (in millions)', fontsize=12)
 axes[1].grid(axis='x', linestyle='--', alpha=0.7)
 for bar in bars2:
     width = bar.get_width()

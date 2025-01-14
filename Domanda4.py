@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 file_path = 'Dataset.csv'
 df = pd.read_csv(file_path, delimiter=';')
 
-
 # Conversione della colonna 'date' in formato datetime
 df['date'] = pd.to_datetime(df['date'], format='%d/%m/%Y', errors='coerce')
 
@@ -19,6 +18,9 @@ df['Semestre'] = df['date'].dt.year.astype(str) + '-H' + ((df['date'].dt.month >
 # Conteggio degli attacchi per trimestre e semestre
 trimestrale = df['Trimestre'].value_counts().sort_index() # Ordinamento per trimestre
 semestrale = df['Semestre'].value_counts().sort_index() # Ordinamento per semestre
+
+trimestrale.to_csv('4_Attacks_by_trimester.csv', header=['# Attacks'], index_label='Trimester')
+semestrale.to_csv('4_Attacks_by_semester.csv', header=['# Attacks'], index_label='Semester')
 
 # Aggiunta dei valori sulle colonne dei grafici e formattazione delle label dei trimestri
 

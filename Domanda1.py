@@ -14,6 +14,7 @@ unique_victims = data.groupby('victim').last().reset_index()
 
 # Conteggio delle occorrenze per "Victim Country"
 country_counts = unique_victims['Victim Country'].value_counts()
+country_counts.sort_values(ascending=False).to_csv('1_Attacks_by_country.csv')
 
 # Calcolo delle percentuali
 total_count = country_counts.sum()
@@ -53,6 +54,7 @@ filtered_data = data[data['gang'].isin(over_100_gangs)]
 
 # Conteggio delle occorrenze per Gang e Victim Country
 grouped_data = filtered_data.groupby(['gang', 'Victim Country']).size().unstack(fill_value=0)
+grouped_data.to_csv('1_Gang_attacks_by_country.csv')
 
 # Calcolo delle percentuali
 percentage_data = grouped_data.div(grouped_data.sum(axis=1), axis=0) * 100
