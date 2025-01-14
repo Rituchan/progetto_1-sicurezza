@@ -75,6 +75,14 @@ all_months = pd.period_range(start='2023-01', end=df['month_year'].max(), freq='
 # Raggruppa i dati per mese-anno e gang
 agg_data = df.groupby(['month_year', gang_column]).size().reset_index(name='occurrences')
 
+# Pivot the table to have gangs as rows and month-year pairs as columns
+pivot_table = agg_data.pivot(index=gang_column, columns='month_year', values='occurrences').fillna(0)
+pivot_table = pivot_table.astype(int)
+
+# Output the result to a CSV file
+output_file = '7_Gang_attacks_by_month.csv'
+pivot_table.to_csv(output_file)
+
 # Filtra solo le gang con occorrenze > 50
 agg_data = agg_data[agg_data['occurrences'] > 50]
 

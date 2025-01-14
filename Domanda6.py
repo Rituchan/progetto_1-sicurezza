@@ -11,6 +11,7 @@ data = data.dropna(subset=['Victim Country', 'Victim sectors'])
 
 # Conteggio delle occorrenze per Victim Country e Victim Sectors
 grouped_data = data.groupby(['Victim Country', 'Victim sectors']).size().unstack(fill_value=0)
+grouped_data.to_csv('6_Attacks_by_country_and_sector.csv')
 
 # Calcolare il totale delle occorrenze per ogni Victim Country
 total_occurrences = grouped_data.sum(axis=1)
@@ -87,6 +88,7 @@ data['triplet'] = data['gang'] + " - " + data['Victim Country'] + " - " + data['
 
 # Calcola le occorrenze di ogni tripla
 triplet_counts = data['triplet'].value_counts()
+triplet_counts.to_csv('6_Attacks_by_triplet.csv')
 
 # Filtra le triplette con occorrenze maggiori di 50
 triplet_counts_filtered = triplet_counts[triplet_counts > 50]

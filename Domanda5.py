@@ -142,6 +142,22 @@ plt.show()
 
 #######################################################################################
 
+# Conta le occorrenze per ogni gang e segmento (senza filtro sulle top 10 gang)
+segment_counts_all = data.groupby(['gang', 'Victim Country', 'Victim sectors']).size().reset_index(name='counts')
+
+# Combina Victim Country e Victim sectors per creare i segmenti
+segment_counts_all['segment'] = segment_counts_all['Victim Country'] + ' - ' + segment_counts_all['Victim sectors']
+
+# Raggruppa i dati in base ai segmenti
+final_counts_all = segment_counts_all.groupby(['gang', 'segment'])['counts'].sum().unstack(fill_value=0)
+
+# Ordina le gang in base al totale decrescente delle occorrenze
+final_counts_all = final_counts_all.loc[final_counts_all.sum(axis=1).sort_values(ascending=False).index]
+
+# Esporta i dati in un file CSV
+output_file_all = '5_Gang_attacks_by_country_and_sector.csv'
+final_counts_all.to_csv(output_file_all, index_label='Ransomware Gang', header=[f'{col}' for col in final_counts_all.columns])
+
 # Filtra le top 10 gang in base al numero di occorrenze
 top_gangs = data['gang'].value_counts().nlargest(10).index
 filtered_data = data[data['gang'].isin(top_gangs)]
@@ -212,6 +228,9 @@ plt.show()
 
 # Contiamo le occorrenze per la colonna 'gang'
 victim_counts = data['victim'].value_counts()
+
+# Create a CSV file with victims and the number of attacks suffered
+victim_counts.to_csv('5_Attacks_by_victim.csv', index_label='Victim', header=['# Attacks Suffered'])
 
 # Filtriamo le gang con più di 500 occorrenze
 top_victims = victim_counts[victim_counts > 2]

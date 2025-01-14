@@ -12,7 +12,7 @@ data = data.dropna(subset=['Victim sectors', 'gang'])
 
 # Count occurrences in "Victim sectors"
 sector_counts = data['Victim sectors'].value_counts()
-sector_counts.to_csv('2_Attacks_by_sector.csv', header=['Count'], index_label='Sector')
+sector_counts.to_csv('2_Attacks_by_sector.csv')
 
 # Calculate percentages
 total_count = sector_counts.sum()
