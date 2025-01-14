@@ -28,9 +28,9 @@ def custom_date_formatter_vertical(x, pos):
 # Plot the line graph with slightly lighter vertical grid lines for the start of each year
 plt.figure(figsize=(12, 6))
 plt.plot(weekly_counts.index, weekly_counts.values, linestyle='-')
-plt.title('Distribuzione degli attacchi nel tempo', fontsize=16)
-plt.xlabel('Settimana', fontsize=12)
-plt.ylabel('Numero di attacchi', fontsize=12)
+plt.title('Distribution of attacks over time', fontsize=16)
+plt.xlabel('', fontsize=12)
+plt.ylabel('# Attacks', fontsize=12)
 plt.grid(visible=True, linestyle='--', alpha=0.6)
 
 # Add vertical grid lines with a lighter color for the start of each year
@@ -95,9 +95,9 @@ for container in ax.containers:
     ax.bar_label(container, label_type='center', fontsize=10, color='black')
 
 # Imposta i titoli e le etichette
-plt.title('Ransomware Gang che hanno commesso più di 50 attacchi in un mese (dal 2023)', fontsize=14)
-plt.xlabel('Mese', fontsize=12)
-plt.ylabel('Numero di attacchi', fontsize=12)
+plt.title('Ransomware Gangs with more than 50 attacks in a month (2023 onwards)', fontsize=14)
+plt.xlabel('Month', fontsize=12)
+plt.ylabel('# Attacks', fontsize=12)
 plt.legend(title='Ransomware Gang')
 plt.xticks(ticks=range(len(all_months)), labels=[m.strftime('%b %Y') for m in all_months], rotation=45)
 

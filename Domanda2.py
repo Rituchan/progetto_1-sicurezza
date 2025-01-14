@@ -38,7 +38,7 @@ plt.figure(figsize=(10, 8))
 pie_data.plot(kind='pie', autopct='%1.1f%%', startangle=90, colors=colors, fontsize=14)
 
 # Customize the chart
-plt.title('Distribuzione degli attacchi in base al settore colpito', fontsize=16)
+plt.title('Attack distribution based on the affected sector', fontsize=16)
 plt.ylabel('')  # Remove Y-axis label
 plt.tight_layout()
 
@@ -105,11 +105,11 @@ for container in bars.containers:
 
 
 # Personalizzazione del grafico
-plt.title('Settori attaccati dalle 20 ransomware gang con più attacchi', fontsize=16)
+plt.title('Attack distribution of the 20 most active Ransomware Gangs based on the affected sector', fontsize=16)
 plt.xlabel('Ransomware Gang', fontsize=14)
-plt.ylabel('Percentuale di attacchi', fontsize=14)
+plt.ylabel('% Attacks', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
-plt.legend(title='Settori', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.legend(title='Sectors', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 
 # Salvataggio del grafico

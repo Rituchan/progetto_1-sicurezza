@@ -31,13 +31,70 @@ for bar in ax.patches:
     )
 
 # Personalizzare il grafico
-plt.title('Top 20 ransomware gang più attive in base al numero di vittime', fontsize=16)
+plt.title('Top 20 most active Ransomware Gangs by number of victims', fontsize=16)
 plt.xlabel('Ransomware Gang', fontsize=14)
-plt.ylabel('Numero di vittime uniche', fontsize=14)
+plt.ylabel('Number of Unique Victims', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 
 # Mostrare il grafico
+plt.tight_layout()
+plt.show()
+
+# Convert the date column to datetime format and extract the year
+data['date'] = pd.to_datetime(data['date'], format='%d/%m/%Y', errors='coerce')
+data['year'] = data['date'].dt.year
+
+# Filter data for the years 2021, 2022, 2023, 2024
+filtered_data = data[data['year'].isin([2021, 2022, 2023, 2024])]
+
+# Calculate unique victims per gang for each year
+unique_victims_by_year = (
+    filtered_data.groupby(['year', 'gang'])['victim']
+    .nunique()
+    .reset_index(name='unique_victims')
+    .sort_values(['year', 'unique_victims'], ascending=[True, False])
+    .groupby('year')
+    .head(10)
+)
+
+# Define years for the subplots
+years = [2021, 2022, 2023, 2024]
+
+# Create subplots for each year with vertical bar plots
+fig, axes = plt.subplots(2, 2, figsize=(16, 12), sharey=True)
+
+# Plot each year's data
+for i, year in enumerate(years):
+    ax = axes[i // 2, i % 2]
+    yearly_data = unique_victims_by_year[unique_victims_by_year['year'] == year]
+
+    sns.barplot(
+        data=yearly_data,
+        x='gang',
+        y='unique_victims',
+        palette='coolwarm',
+        ax=ax
+    )
+
+    # Add values on top of the bars
+    for bar in ax.patches:
+        ax.text(
+            bar.get_x() + bar.get_width() / 2,  # X position
+            bar.get_height() + 0.5,  # Y position
+            int(bar.get_height()),  # Text (number of victims)
+            ha='center',  # Horizontal alignment
+            va='bottom',  # Vertical alignment
+            fontsize=10  # Font size
+        )
+
+    ax.set_title(f'Top 10 Ransomware Gangs in {year} (Unique Victims)', fontsize=14)
+    ax.set_xlabel('', fontsize=12)
+    ax.set_ylabel('Number of Unique Victims', fontsize=12)
+    ax.set_xticklabels(yearly_data['gang'], rotation=45, ha='right', fontsize=10)
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+
+# Adjust layout
 plt.tight_layout()
 plt.show()
 
@@ -94,11 +151,11 @@ for container in bars.containers:
                         ha='center', va='center', fontsize=6, color='black')
 
 # Personalizzazione del grafico
-plt.title('Ransomware Gang che colpiscono principalmente un settore (>40%)', fontsize=16)
+plt.title('Ransomware Gangs that mainly target one sector (>40%)', fontsize=16)
 plt.xlabel('Ransomware Gang', fontsize=14)
-plt.ylabel('Percentuale di attacchi', fontsize=14)
+plt.ylabel('% Attacks', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
-plt.legend(title='Settore', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.legend(title='Sectors', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 
 # Salvataggio del grafico

@@ -116,9 +116,9 @@ fig, axes = plt.subplots(2, 1, figsize=(12, 12))
 
 # Primo istogramma: distribuzione del numero di dipendenti (orizzontale)
 bars1 = axes[0].barh(group_labels, group_counts, color='purple', alpha=0.7, edgecolor='black')
-axes[0].set_title('Distribuzione degli attacchi in base al numero di dipendenti', fontsize=14)
-axes[0].set_xlabel('Numero di attacchi', fontsize=12)
-axes[0].set_ylabel('Numero di dipendenti', fontsize=12)
+axes[0].set_title('Distribution of attacks based on the number of employees', fontsize=14)
+axes[0].set_xlabel('# Attacks', fontsize=12)
+axes[0].set_ylabel('Number of employees', fontsize=12)
 axes[0].grid(axis='x', linestyle='--', alpha=0.7)
 for bar in bars1:
     width = bar.get_width()
@@ -126,9 +126,9 @@ for bar in bars1:
 
 # Secondo istogramma: distribuzione delle vendite (orizzontale)
 bars2 = axes[1].barh(group_labels2, group_counts2, color='green', alpha=0.7, edgecolor='black')
-axes[1].set_title('Distribuzione degli attacchi in base al fatturato', fontsize=14)
-axes[1].set_xlabel('Numero di attacchi', fontsize=12)
-axes[1].set_ylabel('Fatturato (in milioni)', fontsize=12)
+axes[1].set_title('Distribution of attacks based on turnover', fontsize=14)
+axes[1].set_xlabel('# Attacks', fontsize=12)
+axes[1].set_ylabel('Turnover (in millions)', fontsize=12)
 axes[1].grid(axis='x', linestyle='--', alpha=0.7)
 for bar in bars2:
     width = bar.get_width()
@@ -199,10 +199,10 @@ for container in bars.containers:
                         ha='center', va='center', fontsize=9, color='black')
 
 # Configurazione del grafico
-plt.title('Attacchi delle 10 ransomware gang più attive in relazione a nazioni e settori colpiti')
+plt.title('Distribution of attacks of the 10 most active Ransomware Gangs based on affected countries and sectors')
 plt.xlabel('Ransomware Gang')
-plt.ylabel('Numero di attacchi')
-plt.legend(title='Nazione + Settore', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.ylabel('# Attacks')
+plt.legend(title='Countries + Sectors', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 plt.show()
 
@@ -226,9 +226,9 @@ fig, axes = plt.subplots(2, 1, figsize=(12, 12))
 
 # Primo istogramma: Vittime colpite più di 2 volte
 top_victims.plot(kind='barh', color='orange', edgecolor='black', ax=axes[0])
-axes[0].set_title('Vittime colpite più di 2 volte', fontsize=16)
-axes[0].set_ylabel('Vittime', fontsize=14)
-axes[0].set_xlabel('Numero di attacchi subiti', fontsize=14)
+axes[0].set_title('Victims hit more than two times', fontsize=16)
+axes[0].set_ylabel('Victims', fontsize=14)
+axes[0].set_xlabel('# Attacks Suffered', fontsize=14)
 axes[0].xaxis.set_major_locator(MaxNLocator(integer=True))
 
 # Secondo istogramma: Distribuzione delle percentuali
@@ -237,9 +237,9 @@ for bar in bars:
     height = bar.get_height()
     axes[1].text(bar.get_x() + bar.get_width() / 2, height, f'{height:.2f}%', ha='center', va='bottom', fontsize=10)
 
-axes[1].set_title('Distribuzione delle vittime in base alla percentuale di attacchi subiti', fontsize=16)
-axes[1].set_xlabel('Numero di attacchi subiti', fontsize=14)
-axes[1].set_ylabel('Percentuale di attacchi (%)', fontsize=14)
+axes[1].set_title('Distribution of victims based on the percentage of attacks suffered', fontsize=16)
+axes[1].set_xlabel('# Attacks Suffered', fontsize=14)
+axes[1].set_ylabel('% Attacks', fontsize=14)
 axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
 
 # Adattiamo i layout per evitare sovrapposizioni

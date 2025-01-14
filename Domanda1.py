@@ -37,7 +37,7 @@ colors = list(palette) + ['lightgray']  # Ultima fetta "Other (<2%)" in grigio
 pie_data.plot(kind='pie', autopct='%1.1f%%', startangle=90, colors=colors)
 
 # Personalizzazione del grafico
-plt.title('Distribuzione delle vittime in base alla nazionalità', fontsize=16)
+plt.title('Victim distribution based on their country', fontsize=16)
 plt.ylabel('')  # Rimuovere etichetta dell'asse Y
 plt.tight_layout()
 
@@ -109,12 +109,12 @@ for container in bars.containers:
                         ha='center', va='center', fontsize=6, color='black')
 
 # Personalizzazione del grafico
-plt.title('Ransomware Gang che colpiscono principalmente una nazione', fontsize=16)
+plt.title('Ransomware Gangs that mainly target one country', fontsize=16)
 plt.xlabel('Ransomware Gang', fontsize=14)
-plt.ylabel('Percentuale di attacchi', fontsize=14)
+plt.ylabel('% Attacks', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
-plt.legend(title='Nazione', bbox_to_anchor=(1.05, 1), loc='upper left')
-plt.text(x=9.7, y=0, s='Nazioni considerate se:\nUSA > 80%\nOPPURE\nAltre nazioni > 50%',
+plt.legend(title='Countries', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.text(x=9.7, y=0, s='Countries considered if:\nUSA > 80%\nOR\nAltre nazioni > 50%',
          bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.2'))
 plt.tight_layout()
 

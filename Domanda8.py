@@ -28,13 +28,13 @@ activity_by_month_df = activity_by_month.reset_index(name="activity_count")
 
 # Eventi geopolitici chiave
 updated_key_events = {
-    "2022-02": "Inizio guerra Russia-Ucraina",
-    "2022-08": "Visita di Pelosi a Taiwan",
-    "2022-09": "Proteste in Iran (morte di Mahsa Amini)",
-    "2023-04": "La Finlandia entra nella NATO",
-    "2023-07": "Vertice NATO a Vilnius",
-    "2023-10": "Attacco di Hamas a Israele",
-    "2024-11": "Elezioni presidenziali USA",
+    "2022-02": "Start of the Russia-Ukraine war",
+    "2022-08": "Pelosi's visit to Taiwan",
+    "2022-09": "Protests in Iran (death of Mahsa Amini)",
+    "2023-04": "Finland joins NATO",
+    "2023-07": "NATO summit in Vilnius",
+    "2023-10": "Hamas attack on Israel",
+    "2024-11": "U.S. presidential elections",
 }
 
 # Mappare i numeri dei mesi ai nomi abbreviati
@@ -84,9 +84,9 @@ plt.xticks(
 
 # Dettagli del grafico
 plt.grid(color="gray", linestyle="--", linewidth=0.5, alpha=0.7)
-plt.title("Attacchi ransomware in relazione ai principali eventi geopolitici", fontsize=18)
-plt.xlabel("Anno-Mese", fontsize=14)
-plt.ylabel("Numero di attacchi", fontsize=14)
+plt.title("Distribution of attacks in relation to major geopolitical events", fontsize=18)
+plt.xlabel("", fontsize=14)
+plt.ylabel("# Attacks", fontsize=14)
 plt.legend(fontsize=12)
 plt.tight_layout()
 
@@ -178,9 +178,9 @@ for bar_group in ax.containers:
             )
 
 # Personalizzazione del grafico
-plt.title('Distribuzione degli attacchi delle ransomware gang che prendono di mira al massimo 7 nazioni', fontsize=16)
+plt.title('Distribution of Ransomware Gang attacks targeting a maximum of 7 countries', fontsize=16)
 plt.xlabel('Ransomware Gang', fontsize=12)
-plt.ylabel('% Attacchi', fontsize=12)
+plt.ylabel('% Attacks', fontsize=12)
 plt.xticks(rotation=45, ha='right')
 
 # Ricrea la legenda solo con le nazioni presenti

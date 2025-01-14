@@ -70,11 +70,11 @@ for container in bars.containers:
                         ha='center', va='center', fontsize=10, color='black')
 
 # Personalizzazione del grafico
-plt.title('Attacchi in ogni nazione divisi in base al settore attaccato', fontsize=16)
-plt.xlabel('Nazione', fontsize=14)
-plt.ylabel('% Attacchi', fontsize=14)
+plt.title('Distribution of attacks in the most targeted countries (>2%) based on the affected sectors', fontsize=16)
+plt.xlabel('Country', fontsize=14)
+plt.ylabel('% Attacks', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
-plt.legend(title='Settori', bbox_to_anchor=(1.05, 1), loc='upper left')
+plt.legend(title='Sectors', bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.tight_layout()
 
 # Mostrare il grafico
@@ -99,8 +99,35 @@ ax = triplet_counts_filtered.sort_values(ascending=True).plot(kind='barh', color
 for index, value in enumerate(triplet_counts_filtered.sort_values(ascending=True)):
     plt.text(value + 1, index, str(value), va='center')
 
-plt.xlabel('Numero di attacchi')
-plt.ylabel('Triplette (Ransomware Gang - Nazione - Settore)')
-plt.title('Pattern ricorrenti (con più di 50 attacchi)')
+plt.xlabel('# Attacks')
+plt.ylabel('Triplets (Ransomware Gang - Country - Sector)')
+plt.title('Recurring patterns (with more than 50 attacks)')
+plt.tight_layout()
+plt.show()
+
+# Create a combined column with the triplet "gang - Victim Country - Victim sectors"
+data['triplet'] = data['gang'] + " - " + data['Victim Country'] + " - " + data['Victim sectors']
+
+# Exclude rows where "Victim Country" is "USA"
+data_filtered = data[data['Victim Country'] != 'USA']
+
+# Calculate the occurrences of each triplet
+triplet_counts = data_filtered['triplet'].value_counts()
+
+# Filter triplets with occurrences greater than 20
+triplet_counts_filtered = triplet_counts[triplet_counts > 20]
+
+# Plot the histogram
+plt.figure(figsize=(10, 8))
+ax = triplet_counts_filtered.sort_values(ascending=True).plot(kind='barh', color='coral')
+
+
+# Add the number of occurrences next to each bar
+for index, value in enumerate(triplet_counts_filtered.sort_values(ascending=True)):
+    plt.text(value, index, str(value), va='center')  # Adjusted position to be closer to the bar
+
+plt.xlabel('# Attacks')
+plt.ylabel('Triplets (Ransomware Gang - Country - Sector)')
+plt.title('Recurring patterns (with more than 20 attacks, excluding USA)')
 plt.tight_layout()
 plt.show()

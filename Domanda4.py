@@ -32,9 +32,9 @@ trimestrale.plot(kind='bar', ax=axes[0], color='skyblue', edgecolor='black')
 for i, v in enumerate(trimestrale):
     axes[0].text(i, v + 1, str(v), ha='center', fontsize=10)
 
-axes[0].set_title('Andamento trimestrale degli attacchi', fontsize=14)
-axes[0].set_xlabel('Trimestre', fontsize=12)
-axes[0].set_ylabel('Numero di attacchi', fontsize=12)
+axes[0].set_title('Quarterly trend of attacks', fontsize=14)
+axes[0].set_xlabel('', fontsize=12)
+axes[0].set_ylabel('Attacks', fontsize=12)
 axes[0].grid(axis='y', linestyle='--', alpha=0.7)
 
 # Grafico semestrale
@@ -44,9 +44,9 @@ semestrale.plot(kind='bar', ax=axes[1], color='lightgreen', edgecolor='black')
 for i, v in enumerate(semestrale):
     axes[1].text(i, v + 1, str(v), ha='center', fontsize=10)
 
-axes[1].set_title('Andamento semestrale degli attacchi', fontsize=14)
-axes[1].set_xlabel('Semestre', fontsize=12)
-axes[1].set_ylabel('Numero di attacchi', fontsize=12)
+axes[1].set_title('Six-monthly trend of attacks', fontsize=14)
+axes[1].set_xlabel('', fontsize=12)
+axes[1].set_ylabel('# Attacks', fontsize=12)
 axes[1].grid(axis='y', linestyle='--', alpha=0.7)
 
 # Mostra i grafici con le modifiche
@@ -124,10 +124,10 @@ for year, highlights in highlight_dates.items():
         ax.set_title(f"{label}", fontsize=12)
 
         # Modifica l'asse X per mostrare mese e giorno
-        ax.set_xlabel('Mese-Giorno', fontsize=10)
+        ax.set_xlabel('Month-Day', fontsize=10)
         ax.xaxis.set_major_locator(mdates.DayLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
-        ax.set_ylabel('Numero di attacchi', fontsize=10)
+        ax.set_ylabel('# Attacks', fontsize=10)
         ax.grid(True)
         ax.tick_params(axis='x', rotation=90)
         ax.legend(fontsize=8)
