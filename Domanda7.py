@@ -103,7 +103,7 @@ for container in ax.containers:
     ax.bar_label(container, label_type='center', fontsize=10, color='black')
 
 # Imposta i titoli e le etichette
-plt.title('Ransomware Gangs with more than 50 attacks in a month (2023 onwards)', fontsize=14)
+plt.title('Ransomware Gangs with more than 50 attacks in a single month (2023 onwards)', fontsize=14)
 plt.xlabel('Month', fontsize=12)
 plt.ylabel('# Attacks', fontsize=12)
 plt.legend(title='Ransomware Gang')

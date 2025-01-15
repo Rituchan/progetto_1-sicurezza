@@ -74,24 +74,29 @@ for i, year in enumerate(years):
         data=yearly_data,
         x='gang',
         y='unique_victims',
+        hue='gang',  # Assigning x to hue to avoid warnings
+        dodge=False,
         palette='coolwarm',
         ax=ax
     )
 
     # Add values on top of the bars
     for bar in ax.patches:
-        ax.text(
-            bar.get_x() + bar.get_width() / 2,  # X position
-            bar.get_height() + 0.5,  # Y position
-            int(bar.get_height()),  # Text (number of victims)
-            ha='center',  # Horizontal alignment
-            va='bottom',  # Vertical alignment
-            fontsize=10  # Font size
-        )
+        bar_height = bar.get_height()
+        if bar_height > 0:  # Avoid cluttering with zero values
+            ax.text(
+                bar.get_x() + bar.get_width() / 2,  # X position
+                bar.get_height() + 0.5,  # Y position
+                int(bar_height),  # Text (number of victims)
+                ha='center',  # Horizontal alignment
+                va='bottom',  # Vertical alignment
+                fontsize=10  # Font size
+            )
 
     ax.set_title(f'Top 10 Ransomware Gangs in {year} (Unique Victims)', fontsize=14)
     ax.set_xlabel('', fontsize=12)
     ax.set_ylabel('Number of Unique Victims', fontsize=12)
+    ax.set_xticks(range(len(yearly_data)))
     ax.set_xticklabels(yearly_data['gang'], rotation=45, ha='right', fontsize=10)
     ax.grid(axis='y', linestyle='--', alpha=0.7)
 
@@ -112,7 +117,7 @@ grouped_data = filtered_data.groupby(['gang', 'Victim sectors']).size().unstack(
 # Calcolo delle percentuali
 percentage_data = grouped_data.div(grouped_data.sum(axis=1), axis=0) * 100
 
-# Filtrare le gang con percentuale > 80% su Victim Country: USA e > 50% su un'altra singola Victim Country
+# Filtrare le gang con percentuale > 40% su un settore
 filtered_gangs = percentage_data[(percentage_data.max(axis=1) > 40)]
 
 # Aggiungere la categoria "other" per i settori colpiti meno del 2%
@@ -132,7 +137,7 @@ processed_data = processed_data.loc[processed_data.max(axis=1).sort_values(ascen
 # Creazione del grafico a barre con annotazioni
 fig, ax = plt.subplots(figsize=(14, 8))
 
-#una sola palette non è sufficiente per rappresentare tutti
+# Creazione dinamica della palette
 colors_palette = (sns.color_palette("deep") + sns.color_palette("pastel"))# Generazione della palette husl con tanti colori quanti sono i paesi
 colors = sns.color_palette(colors_palette, n_colors=len(processed_data.columns))
 if 'other' in processed_data.columns:
@@ -152,7 +157,7 @@ for container in bars.containers:
                         ha='center', va='center', fontsize=6, color='black')
 
 # Personalizzazione del grafico
-plt.title('Ransomware Gangs that mainly target one sector (>40%)', fontsize=16)
+plt.title('Ransomware Gangs which mainly target one sector (>40%)', fontsize=16)
 plt.xlabel('Ransomware Gang', fontsize=14)
 plt.ylabel('% Attacks', fontsize=14)
 plt.xticks(rotation=45, ha='right', fontsize=12)
