@@ -260,7 +260,7 @@ for bar in bars:
 
 axes[1].set_title('Distribution of victims based on the percentage of attacks suffered', fontsize=16)
 axes[1].set_xlabel('# Attacks Suffered', fontsize=14)
-axes[1].set_ylabel('% Attacks', fontsize=14)
+axes[1].set_ylabel('% Victims', fontsize=14)
 axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
 
 # Adattiamo i layout per evitare sovrapposizioni
