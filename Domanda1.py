@@ -9,6 +9,10 @@ data = pd.read_csv(file_path, delimiter=';')
 # Pulizia dei dati: rimuovere eventuali valori nulli nella colonna "Victim Country"
 data = data.dropna(subset=['Victim Country', 'gang'])
 
+# Contare il numero di vittime uniche per ogni gang
+victims_per_country = data.groupby('Victim Country')['victim'].nunique()
+victims_per_country.sort_values(ascending=False).to_csv('1_Victims_by_country.csv', header=['Unique Victims'])
+
 # Conversione della colonna "date" in formato datetime e creazione della colonna "year"
 data['date'] = pd.to_datetime(data['date'], format='%d/%m/%Y', errors='coerce')
 data['year'] = data['date'].dt.year.astype('Int64')
@@ -20,7 +24,7 @@ unique_victims = data.groupby('victim').last().reset_index()
 country_counts_by_year = unique_victims.groupby(['year', 'Victim Country']).size().reset_index(name='count')
 
 # Esportazione del CSV aggiornato
-country_counts_by_year.to_csv('1_Attacks_by_country_filtered_by_year.csv', index=False)
+country_counts_by_year.to_csv('1_Victims_by_country_filtered_by_year.csv', index=False)
 
 # Conteggio aggregato delle occorrenze per "Victim Country"
 country_counts = unique_victims['Victim Country'].value_counts()

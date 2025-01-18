@@ -17,11 +17,11 @@ sector_counts.to_csv('2_Attacks_by_sector.csv')
 data['date'] = pd.to_datetime(data['date'], format='%d/%m/%Y', errors='coerce')
 data['year'] = data['date'].dt.year.astype('Int64')
 
-# Conteggio delle occorrenze per "Victim Country" con il filtro per anno
-attacks_sector_by_year = data.groupby(['year', 'Victim sectors']).size().reset_index(name='count')
+# Conteggio degli attacchi per "Victim sectors" e "year"
+attacks_by_sector_and_year = data.groupby(['year', 'Victim sectors']).size().reset_index(name='count')
 
 # Esportazione del CSV aggiornato
-attacks_sector_by_year.to_csv('2_Attacks_by_sector_filtered_by_year.csv', index=False)
+attacks_by_sector_and_year.to_csv('2_Attacks_by_sector_filtered_by_year.csv', index=False)
 
 # Calculate percentages
 total_count = sector_counts.sum()
@@ -65,7 +65,7 @@ fig, axes = plt.subplots(2, 2, figsize=(15, 12))  # 2x2 grid di grafici
 axes = axes.flatten()  # Rendere l'array bidimensionale piatto per iterare facilmente
 
 for i, year in enumerate(years[:4]):  # Iterare sui primi 4 anni disponibili
-    year_data = attacks_sector_by_year[attacks_sector_by_year['year'] == year]
+    year_data = attacks_by_sector_and_year[attacks_by_sector_and_year['year'] == year]
     year_data = year_data.set_index('Victim sectors')['count']
     percentages = (year_data / year_data.sum()) * 100
     year_data = year_data.sort_values(ascending=False)
