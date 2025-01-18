@@ -84,7 +84,6 @@ plt.grid(color="gray", linestyle="--", linewidth=0.5, alpha=0.7)
 plt.title("Distribution of attacks in relation to major geopolitical events", fontsize=18)
 plt.xlabel("", fontsize=14)
 plt.ylabel("# Attacks", fontsize=14)
-plt.legend(fontsize=12)
 plt.tight_layout()
 
 # Mostrare il grafico
