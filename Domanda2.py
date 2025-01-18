@@ -1,6 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.colors import ListedColormap
 import seaborn as sns
 
 # Caricamento dei dati
@@ -14,16 +13,12 @@ data = data.dropna(subset=['Victim sectors', 'gang'])
 sector_counts = data['Victim sectors'].value_counts()
 sector_counts.to_csv('2_Attacks_by_sector.csv')
 
-
 # Conversione della colonna "date" in formato datetime e creazione della colonna "year"
 data['date'] = pd.to_datetime(data['date'], format='%d/%m/%Y', errors='coerce')
 data['year'] = data['date'].dt.year.astype('Int64')
 
-
-unique_victims = data.groupby('victim').last().reset_index()
-
 # Conteggio delle occorrenze per "Victim Country" con il filtro per anno
-attacks_sector_by_year = unique_victims.groupby(['year', 'Victim sectors']).size().reset_index(name='count')
+attacks_sector_by_year = data.groupby(['year', 'Victim sectors']).size().reset_index(name='count')
 
 # Esportazione del CSV aggiornato
 attacks_sector_by_year.to_csv('2_Attacks_by_sector_filtered_by_year.csv', index=False)
@@ -62,9 +57,8 @@ plt.ylabel('')  # Rimuovere etichetta dell'asse Y
 plt.tight_layout()
 plt.show()
 
-# Creazione di grafici a torta separati per anno
-years = attacks_sector_by_year['year'].dropna().unique()  # Anni disponibili
-years = sorted(years)  # Ordinare gli anni
+# Selezionare i 4 anni specifici
+years = [2021, 2022, 2023, 2024]
 
 # Creazione del plot con 4 grafici
 fig, axes = plt.subplots(2, 2, figsize=(15, 12))  # 2x2 grid di grafici
@@ -74,6 +68,7 @@ for i, year in enumerate(years[:4]):  # Iterare sui primi 4 anni disponibili
     year_data = attacks_sector_by_year[attacks_sector_by_year['year'] == year]
     year_data = year_data.set_index('Victim sectors')['count']
     percentages = (year_data / year_data.sum()) * 100
+    year_data = year_data.sort_values(ascending=False)
 
     # Raggruppamento delle occorrenze sotto il 3% in "other"
     above_threshold = year_data[percentages >= 4]
@@ -100,7 +95,7 @@ for i, year in enumerate(years[:4]):  # Iterare sui primi 4 anni disponibili
 for j in range(len(years), 4):
     axes[j].axis('off')
 
-plt.suptitle('Attack Distribution based on the affected Sector for Each Year', fontsize=16)
+plt.suptitle('Attack Distribution based on the affected Sector by Year', fontsize=16)
 plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adattare i grafici al layout
 plt.show()
 
@@ -144,7 +139,7 @@ filtered_gangs = filtered_gangs.div(filtered_gangs.sum(axis=1), axis=0) * 100
 # Ordinare i dati filtrati per la percentuale massima
 processed_data = filtered_gangs.loc[filtered_gangs.max(axis=1).sort_values(ascending=False).index]
 
-
+palette_global = sns.color_palette(colors_palette)
 # Aggiungi un colore personalizzato per la categoria 'Other' (lightgray)
 colors = ['lightgray' if col == 'Other' else sns.color_palette(palette_global)[i] for i, col in enumerate(processed_data.columns)]
 

@@ -13,6 +13,19 @@ data = data.dropna(subset=['gang'])
 victims_per_gang = data.groupby('gang')['victim'].nunique()
 victims_per_gang.sort_values(ascending=False).to_csv('3_Victims_by_gang.csv', header=['Unique Victims'])
 
+# Conversione della colonna "date" in formato datetime e creazione della colonna "year"
+data['date'] = pd.to_datetime(data['date'], format='%d/%m/%Y', errors='coerce')
+data['year'] = data['date'].dt.year.astype('Int64')
+
+# Raggruppamento dei dati per "victim" e selezione dell'ultima occorrenza
+unique_victims = data.groupby('victim').last().reset_index()
+
+# Conteggio delle occorrenze per "Victim Country" con il filtro per anno
+gang_victims_by_year = unique_victims.groupby(['year', 'gang']).size().reset_index(name='count')
+
+# Esportazione del CSV aggiornato
+gang_victims_by_year.to_csv('3_Victims_by_gang_filtered_by_year.csv', index=False)
+
 # Selezionare solo le top 20 gang con più vittime uniche
 top_20_victims_per_gang = victims_per_gang.sort_values(ascending=False).head(20)
 

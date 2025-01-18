@@ -50,14 +50,13 @@ pie_data.plot(
 )
 
 # Personalizzazione del grafico aggregato
-plt.title('Victim distribution based on their country of residence', fontsize=16)
+plt.title('Victim Distribution based on their Country of residence', fontsize=16)
 plt.ylabel('')  # Rimuovere etichetta dell'asse Y
 plt.tight_layout()
 plt.show()
 
-# Creazione di grafici a torta separati per anno
-years = country_counts_by_year['year'].dropna().unique()  # Anni disponibili
-years = sorted(years)  # Ordinare gli anni
+# Selezionare i 4 anni specifici
+years = [2021, 2022, 2023, 2024]
 
 # Creazione del plot con 4 grafici
 fig, axes = plt.subplots(2, 2, figsize=(15, 12))  # 2x2 grid di grafici
@@ -67,6 +66,7 @@ for i, year in enumerate(years[:4]):  # Iterare sui primi 4 anni disponibili
     year_data = country_counts_by_year[country_counts_by_year['year'] == year]
     year_data = year_data.set_index('Victim Country')['count']
     percentages = (year_data / year_data.sum()) * 100
+    year_data = year_data.sort_values(ascending=False)
 
     # Raggruppamento delle occorrenze sotto il 3% in "other"
     above_threshold = year_data[percentages >= 3]
@@ -93,7 +93,7 @@ for i, year in enumerate(years[:4]):  # Iterare sui primi 4 anni disponibili
 for j in range(len(years), 4):
     axes[j].axis('off')
 
-plt.suptitle('Victim Distribution by Country for Each Year', fontsize=16)
+plt.suptitle('Victim Distribution based on their Country of residence by Year', fontsize=16)
 plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adattare i grafici al layout
 plt.show()
 
