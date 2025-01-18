@@ -93,7 +93,7 @@ pivot_data = agg_data.pivot(index='month_year', columns=gang_column, values='occ
 pivot_data = pivot_data.reindex(all_months, fill_value=0)
 
 # Configura la palette dei colori
-palette = sns.color_palette('pastel', n_colors=len(pivot_data.columns))
+palette = sns.color_palette('Set3', n_colors=len(pivot_data.columns))
 
 # Crea l'istogramma a barre impilate
 ax = pivot_data.plot(kind='bar', stacked=True, figsize=(14, 7), color=palette, edgecolor='black')

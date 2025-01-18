@@ -111,7 +111,7 @@ plt.show()
 data['triplet'] = data['gang'] + " - " + data['Victim Country'] + " - " + data['Victim sectors']
 
 # Exclude rows where "Victim Country" is "USA"
-data_filtered = data[data['Victim Country'] != 'USA']
+data_filtered = data[data['Victim Country'] != 'Usa']
 
 # Calculate the occurrences of each triplet
 triplet_counts = data_filtered['triplet'].value_counts()

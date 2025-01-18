@@ -83,25 +83,18 @@ data = data.dropna(subset=['date'])  # Rimuovi righe con date non valide
 highlight_dates = {
     '2021': [
         (pd.to_datetime('2021-03-03'), 'CVE-2021-26855 (ProxyLogon)'),
-        (pd.to_datetime('2021-04-23'), 'CVE-2021-22893'),
+        #(pd.to_datetime('2021-04-23'), 'CVE-2021-22893'),
         (pd.to_datetime('2021-07-02'), 'CVE-2021-34527 (PrintNightmare)')
     ],
     '2022': [
         (pd.to_datetime('2022-04-11'), 'CVE-2022-22954'),
         (pd.to_datetime('2022-06-03'), 'CVE-2022-26134 (Atlassian Confluence RCE)'),
-        (pd.to_datetime('2022-07-17'), 'CVE-2022-26352')
-    ],
-    '2023': [
-        (pd.to_datetime('2023-03-12'), 'CVE-2023-48788')
-    ],
-    '2024': [
-        (pd.to_datetime('2024-01-24'), 'CVE-2024-23897'),
-        (pd.to_datetime('2024-02-21'), 'CVE-2024-1709')
+        #(pd.to_datetime('2022-07-17'), 'CVE-2022-26352')
     ]
 }
 
 # Creazione della griglia 3x3
-fig, axes = plt.subplots(3, 3, figsize=(18, 18))
+fig, axes = plt.subplots(2, 2, figsize=(18, 18))
 axes = axes.flatten()
 
 # Indicizzazione dei subplot
@@ -131,7 +124,7 @@ for year, highlights in highlight_dates.items():
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
         ax.set_ylabel('# Attacks', fontsize=10)
         ax.grid(True)
-        ax.tick_params(axis='x', rotation=90)
+        ax.tick_params(axis='x', rotation=0)
         ax.legend(fontsize=8)
         plot_index += 1
 

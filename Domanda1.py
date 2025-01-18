@@ -60,19 +60,19 @@ grouped_data.to_csv('1_Gang_attacks_by_country.csv')
 percentage_data = grouped_data.div(grouped_data.sum(axis=1), axis=0) * 100
 
 # Filtrare le gang con percentuale > 80% su Victim Country: USA e > 50% su un'altra singola Victim Country
-usa_filter = percentage_data['USA'] > 80
-other_country_filter = (percentage_data.drop(columns=['USA']).max(axis=1) > 50)
+usa_filter = percentage_data['Usa'] > 80
+other_country_filter = (percentage_data.drop(columns=['Usa']).max(axis=1) > 50)
 filtered_gangs = percentage_data[(usa_filter) | (other_country_filter)]
 
 # Aggiungere la categoria "other"
 def process_gang(row):
-    usa_percentage = row['USA']
-    other_countries = row.drop(labels=['USA'])
+    usa_percentage = row['Usa']
+    other_countries = row.drop(labels=['Usa'])
     top_percentage = other_countries.max()
     if top_percentage < 50:
         other_percentage = 100 - usa_percentage
         return pd.Series({
-            'USA': usa_percentage,
+            'Usa': usa_percentage,
             'other': other_percentage
         })
     else:
