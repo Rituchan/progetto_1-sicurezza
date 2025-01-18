@@ -29,10 +29,7 @@ activity_by_month_df = activity_by_month.reset_index(name="activity_count")
 # Eventi geopolitici chiave
 updated_key_events = {
     "2022-02": "Start of the Russia-Ukraine war",
-    "2022-08": "Pelosi's visit to Taiwan",
-    "2022-09": "Protests in Iran (death of Mahsa Amini)",
     "2023-04": "Finland joins NATO",
-    "2023-07": "NATO summit in Vilnius",
     "2023-10": "Hamas attack on Israel",
     "2024-11": "U.S. presidential elections",
 }
@@ -55,14 +52,14 @@ plt.figure(figsize=(15, 10))
 plt.plot(
     activity_by_month_df["year_month"].astype(str),
     activity_by_month_df["activity_count"],
-    label="Attacchi",
+    label="",
     color="blue",
     linewidth=2,
 )
 
 # Aggiungere le linee verticali per gli eventi
 for event_date, event_name in updated_key_events.items():
-    plt.axvline(x=event_date, color="red", linestyle="--", alpha=0.7)
+    plt.axvline(x=event_date, color="orange", linestyle="--", alpha=0.7)
     plt.text(
         event_date,
         max(activity_by_month_df["activity_count"]) / 2,
@@ -92,6 +89,77 @@ plt.tight_layout()
 
 # Mostrare il grafico
 plt.show()
+
+# Leggere il dataset specificando il delimitatore corretto
+dataset = data
+
+# Convertire la colonna "date" in formato datetime
+dataset['date'] = pd.to_datetime(dataset['date'], format='%d/%m/%Y', errors='coerce')
+
+# Funzione per aggiungere una linea verticale con testo
+def add_vertical_line(ax, date, label):
+    ax.axvline(x=date, color='orange', linestyle='--', linewidth=1.5)
+    ax.text(
+        x=date,
+        y=ax.get_ylim()[1] * 0.9,  # Posizionare il testo vicino alla cima del grafico
+        s=label,
+        color='black',
+        fontsize=12,
+        rotation=90,
+        va='top',
+        ha='right',
+        fontweight="bold"
+    )
+
+# Creare la figura con 3 subplot disposti su 3 righe e 1 colonna
+fig, axes = plt.subplots(3, 1, figsize=(14, 18))
+
+# Subplot 1: Attacchi a Paesi Nato, 2023-04-04
+attacks_nato = dataset[
+    (dataset['Victim Country'].str.lower().isin(['estonia', 'latvia', 'lithuania', 'poland', 'romania', 'bulgaria', 'hungary', 'slovakia', 'czech republic', 'slovenia', 'netherlands', 'belgium', 'france', 'luxembourg', 'germany', 'italy', 'spain', 'portugal', 'norway', 'denmark', 'iceland', 'canada', 'usa'])) &
+    (dataset['date'] >= '2023-01-04') & (dataset['date'] <= '2023-07-04')  # 3 mesi prima e dopo
+]
+daily_attacks_nato = attacks_nato.groupby('date').size()
+
+axes[0].plot(daily_attacks_nato.index, daily_attacks_nato.values, marker='', color='green')
+axes[0].set_title('Ransomware attacks targeting NATO countries')
+axes[0].set_xlabel('')
+axes[0].set_ylabel('# Attacks')
+axes[0].grid(True)
+add_vertical_line(axes[0], pd.to_datetime('2023-04-04'), 'Finland joins NATO')
+
+# Subplot 2: Attacchi a Israele, 2023-10-07
+attacks_israel = dataset[
+    (dataset['Victim Country'].str.lower() == 'israel') &
+    (dataset['date'] >= '2023-07-07') & (dataset['date'] <= '2024-01-07')  # 3 mesi prima e dopo
+]
+daily_attacks_israel = attacks_israel.groupby('date').size()
+
+axes[1].plot(daily_attacks_israel.index, daily_attacks_israel.values, marker='', color='blue')
+axes[1].set_title('Ransomware attacks targeting Israel')
+axes[1].set_xlabel('')
+axes[1].set_ylabel('# Attacks')
+axes[1].grid(True)
+add_vertical_line(axes[1], pd.to_datetime('2023-10-07'), 'Hamas attack on Israel')
+
+# Subplot 3: Attacchi a USA, 2024-11-05
+attacks_usa = dataset[
+    (dataset['Victim Country'].str.lower() == 'usa') &
+    (dataset['date'] >= '2024-08-05') & (dataset['date'] <= '2025-02-05')  # 3 mesi prima e dopo
+]
+daily_attacks_usa = attacks_usa.groupby('date').size()
+
+axes[2].plot(daily_attacks_usa.index, daily_attacks_usa.values, marker='', color='purple')
+axes[2].set_title('Ransomware attacks targeting USA')
+axes[2].set_xlabel('')
+axes[2].set_ylabel('# Attacks')
+axes[2].grid(True)
+add_vertical_line(axes[2], pd.to_datetime('2024-11-05'), 'U.S. presidential elections')
+
+# Layout e visualizzazione
+plt.tight_layout()
+plt.show()
+
 
 ###############################################################################################
 
