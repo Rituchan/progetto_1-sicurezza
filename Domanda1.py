@@ -9,14 +9,21 @@ data = pd.read_csv(file_path, delimiter=';')
 # Pulizia dei dati: rimuovere eventuali valori nulli nella colonna "Victim Country"
 data = data.dropna(subset=['Victim Country', 'gang'])
 
+# Conversione della colonna "date" in formato datetime e creazione della colonna "year"
+data['date'] = pd.to_datetime(data['date'], format='%d/%m/%Y', errors='coerce')
+data['year'] = data['date'].dt.year.astype('Int64')
+
 # Raggruppamento dei dati per "victim" e selezione dell'ultima occorrenza
 unique_victims = data.groupby('victim').last().reset_index()
 
-# Conteggio delle occorrenze per "Victim Country"
-country_counts = unique_victims['Victim Country'].value_counts()
-country_counts.sort_values(ascending=False).to_csv('1_Attacks_by_country.csv')
+# Conteggio delle occorrenze per "Victim Country" con il filtro per anno
+country_counts_by_year = unique_victims.groupby(['year', 'Victim Country']).size().reset_index(name='count')
 
-# Calcolo delle percentuali
+# Esportazione del CSV aggiornato
+country_counts_by_year.to_csv('1_Attacks_by_country_filtered_by_year.csv', index=False)
+
+# Conteggio aggregato delle occorrenze per "Victim Country"
+country_counts = unique_victims['Victim Country'].value_counts()
 total_count = country_counts.sum()
 percentages = (country_counts / total_count) * 100
 
@@ -28,21 +35,66 @@ below_threshold = percentages[percentages < 2].sum()
 pie_data = above_threshold.copy()
 pie_data['Other (<2%)'] = below_threshold
 
+# Creazione della palette globale con grigio per "Other"
+countries = pie_data.index
+palette_global = sns.color_palette("deep", n_colors=len(countries) - 1)  # Escludendo "Other"
+colors_mapping = dict(zip(countries, list(palette_global) + ['lightgray']))  # Aggiungere grigio per "Other"
 
-# Creazione del grafico a torta
+# Creazione del grafico aggregato
 plt.figure(figsize=(10, 8))
-# Generazione della palette husl con tanti colori quanti sono i paesi
-palette = sns.color_palette("deep", n_colors=len(above_threshold))
-# Aggiungere il colore grigio per "Other (<2%)"
-colors = list(palette) + ['lightgray']  # Ultima fetta "Other (<2%)" in grigio
-pie_data.plot(kind='pie', autopct='%1.1f%%', startangle=90, colors=colors)
+pie_data.plot(
+    kind='pie',
+    autopct='%1.1f%%',
+    startangle=90,
+    colors=[colors_mapping[country] for country in pie_data.index]
+)
 
-# Personalizzazione del grafico
+# Personalizzazione del grafico aggregato
 plt.title('Victim distribution based on their country of residence', fontsize=16)
 plt.ylabel('')  # Rimuovere etichetta dell'asse Y
 plt.tight_layout()
+plt.show()
 
-# Salvataggio del grafico
+# Creazione di grafici a torta separati per anno
+years = country_counts_by_year['year'].dropna().unique()  # Anni disponibili
+years = sorted(years)  # Ordinare gli anni
+
+# Creazione del plot con 4 grafici
+fig, axes = plt.subplots(2, 2, figsize=(15, 12))  # 2x2 grid di grafici
+axes = axes.flatten()  # Rendere l'array bidimensionale piatto per iterare facilmente
+
+for i, year in enumerate(years[:4]):  # Iterare sui primi 4 anni disponibili
+    year_data = country_counts_by_year[country_counts_by_year['year'] == year]
+    year_data = year_data.set_index('Victim Country')['count']
+    percentages = (year_data / year_data.sum()) * 100
+
+    # Raggruppamento delle occorrenze sotto il 3% in "other"
+    above_threshold = year_data[percentages >= 3]
+    below_threshold = year_data[percentages < 3].sum()
+
+    # Aggiungere la categoria "other" se necessario
+    if below_threshold > 0:
+        above_threshold['Other (<3%)'] = below_threshold
+
+    # Creazione del grafico a torta con colori coerenti
+    above_threshold.plot(
+        kind='pie',
+        autopct='%1.1f%%',
+        startangle=90,
+        colors=[colors_mapping.get(country, 'lightgray') for country in above_threshold.index],
+        ax=axes[i]
+    )
+
+    # Personalizzazione
+    axes[i].set_title(f'Year {year}', fontsize=14)
+    axes[i].set_ylabel('')  # Rimuovere etichetta dell'asse Y
+
+# Nascondere gli assi inutilizzati se ci sono meno di 4 anni
+for j in range(len(years), 4):
+    axes[j].axis('off')
+
+plt.suptitle('Victim Distribution by Country for Each Year', fontsize=16)
+plt.tight_layout(rect=[0, 0, 1, 0.95])  # Adattare i grafici al layout
 plt.show()
 
 #######################################################################
