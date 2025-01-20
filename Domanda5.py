@@ -226,43 +226,43 @@ plt.show()
 
 #######################################################################################
 
-# Contiamo le occorrenze per la colonna 'gang'
+# Conteggio delle vittime
 victim_counts = data['victim'].value_counts()
 
-# Create a CSV file with victims and the number of attacks suffered
+# Creazione del file CSV
 victim_counts.to_csv('5_Attacks_by_victim.csv', index_label='Victim', header=['# Attacks Suffered'])
 
-# Filtriamo le gang con più di 500 occorrenze
+# Filtriamo le gang con più di 2 occorrenze
 top_victims = victim_counts[victim_counts > 2]
 
-# Raggruppiamo le vittime in base al numero di attacchi subiti
+# Raggruppamento per numero di attacchi subiti
 attack_groups = victim_counts.value_counts().sort_index()
 
-# Calcoliamo le percentuali
+# Calcolo delle percentuali
 total_attacks = victim_counts.sum()
 attack_groups_percentage = (attack_groups / total_attacks) * 100
 
-# Creiamo una figura con due sottotrame (subplots)
-fig, axes = plt.subplots(2, 1, figsize=(12, 12))
+# Primo grafico: Vittime colpite più di 2 volte (grafico a barre orizzontali)
+plt.figure(figsize=(12, 6))
+top_victims.plot(kind='barh', color='orange', edgecolor='black')
+plt.title('Victims hit more than two times', fontsize=16)
+plt.ylabel('Victims', fontsize=14)
+plt.xlabel('# Attacks Suffered', fontsize=14)
+plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
+plt.tight_layout()
+plt.show()
 
-# Primo istogramma: Vittime colpite più di 2 volte
-top_victims.plot(kind='barh', color='orange', edgecolor='black', ax=axes[0])
-axes[0].set_title('Victims hit more than two times', fontsize=16)
-axes[0].set_ylabel('Victims', fontsize=14)
-axes[0].set_xlabel('# Attacks Suffered', fontsize=14)
-axes[0].xaxis.set_major_locator(MaxNLocator(integer=True))
-
-# Secondo istogramma: Distribuzione delle percentuali
-bars = axes[1].bar(attack_groups_percentage.index, attack_groups_percentage, color='steelblue', edgecolor='black')
+# Secondo grafico: Distribuzione delle percentuali (grafico a barre orizzontali con assi invertiti)
+plt.figure(figsize=(12, 3))
+sorted_attack_groups = attack_groups_percentage.sort_index(ascending=True)  # Inverti l'ordine
+bars = plt.barh(sorted_attack_groups.index, sorted_attack_groups, color='steelblue', edgecolor='black')  # Barre più sottili
 for bar in bars:
-    height = bar.get_height()
-    axes[1].text(bar.get_x() + bar.get_width() / 2, height, f'{height:.2f}%', ha='center', va='bottom', fontsize=10)
+    width = bar.get_width()
+    plt.text(width, bar.get_y() + bar.get_height() / 2, f'{width:.2f}%', ha='left', va='center', fontsize=10)
 
-axes[1].set_title('Distribution of victims based on the percentage of attacks suffered', fontsize=16)
-axes[1].set_xlabel('# Attacks Suffered', fontsize=14)
-axes[1].set_ylabel('% Victims', fontsize=14)
-axes[1].xaxis.set_major_locator(MaxNLocator(integer=True))
-
-# Adattiamo i layout per evitare sovrapposizioni
+plt.title('Distribution of victims based on the number of attacks suffered', fontsize=16)
+plt.ylabel('# Attacks Suffered', fontsize=14)
+plt.xlabel('% Victims', fontsize=14)
+plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
 plt.tight_layout()
 plt.show()

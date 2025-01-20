@@ -94,7 +94,7 @@ triplet_counts.to_csv('6_Attacks_by_triplet.csv')
 triplet_counts_filtered = triplet_counts[triplet_counts > 60]
 
 # Plotta l'istogramma
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(10, 5))
 ax = triplet_counts_filtered.sort_values(ascending=True).plot(kind='barh', color='coral')
 
 # Aggiungi il numero delle occorrenze accanto a ciascuna barra
@@ -120,7 +120,7 @@ triplet_counts = data_filtered['triplet'].value_counts()
 triplet_counts_filtered = triplet_counts[triplet_counts > 20]
 
 # Plot the histogram
-plt.figure(figsize=(10, 4))
+plt.figure(figsize=(10, 3))
 ax = triplet_counts_filtered.sort_values(ascending=True).plot(kind='barh', color='coral')
 
 
@@ -129,7 +129,7 @@ for index, value in enumerate(triplet_counts_filtered.sort_values(ascending=True
     plt.text(value, index, str(value), va='center')  # Adjusted position to be closer to the bar
 
 plt.xlabel('# Attacks')
-plt.ylabel('Triplets (Ransomware Gang - Country - Sector)')
+plt.ylabel('Triplets')
 plt.title('Recurring patterns (with more than 20 attacks, excluding USA)')
 plt.tight_layout()
 plt.show()
